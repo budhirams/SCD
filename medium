@@ -1,0 +1,167 @@
+sudo nano /etc/modprobe.d/filesystem.conf
+install cramfs /bin/true
+install freevxfs /bin/true
+install hfs /bin/true
+install hfsplus /bin/true
+install jffs2 /bin/true
+install squashfs /bin/true
+install udf /bin/true
+install usb-storage /bin/true
+
+
+✔ jiff2 गलत था → सही नाम jffs2
+
+2. Modules को तुरंत unload करें
+modprobe -r cramfs freevxfs hfs hfsplus squashfs udf usb-storage 2>/dev/null
+
+
+✅ B. Secure Mount Points (/etc/fstab Hardening)
+
+Security बढ़ाने के लिए /tmp, /var/tmp, /dev/shm पर
+nodev, nosuid, noexec options लगाते हैं।
+
+vim /etc/fstab
+
+tmpfs /tmp     tmpfs defaults,nodev,nosuid,noexec,mode=1777 0 0
+tmpfs /var/tmp tmpfs defaults,nodev,nosuid,noexec,mode=1777 0 0
+tmpfs /dev/shm tmpfs defaults,nodev,nosuid,noexec,mode=1777 0 0
+
+
+mode=1777 → world-writable but secure sticky bit
+
+2. Remount Commands (बिना reboot के changes लागू)
+
+mount -o remount,nodev /tmp
+mount -o remount,nosuid /tmp
+mount -o remount,noexec /tmp
+
+mount -o remount,nodev /var/tmp
+mount -o remount,nosuid /var/tmp
+mount -o remount,noexec /var/tmp
+
+mount -o remount,nodev /home
+
+mount -o remount,nodev /dev/shm
+mount -o remount,nosuid /dev/shm
+mount -o remount,noexec /dev/shm
+
+✅ C. Apply System Updates (systemd reload etc.)
+mount -a
+systemctl daemon-reload
+
+
+1. Mounts Verify करें
+
+सभी mount दिखाने के लिए:
+mount
+केवल तीन mounts filter करके देखने के लिए:
+mount | grep -E "/tmp|/var/tmp|/dev/shm"
+
+Expected output में होना चाहिए:
+nodev,nosuid,noexec,mode=1777
+
+✔ अगर तीनों options दिखाई दे रहे हैं → OK
+❌ अगर एक भी missing है → fstab fix करें
+
+2. /etc/fstab Verify करें
+grep -E "tmpfs.*tmp|var/tmp|dev/shm" /etc/fstab
+
+Expected entry example:
+tmpfs /tmp     tmpfs defaults,nodev,nosuid,noexec,mode=1777 0 0
+tmpfs /var/tmp tmpfs defaults,nodev,nosuid,noexec,mode=1777 0 0
+tmpfs /dev/shm tmpfs defaults,nodev,nosuid,noexec,mode=1777 0 0
+
+✔ यह confirm करता है कि next reboot पर भी यह settings apply होंगी।
+
+✅ B. Verify Disabled Filesystem Kernel Modules
+
+आपके system hardening के parts के अनुसार नीचे verification के 3-steps का full checklist दिया है।
+
+आपको हर module के लिए वही 3 steps चलाने हैं:
+
+cramfs
+
+freevxfs
+
+hfs
+
+hfsplus
+
+jffs2
+
+squashfs
+
+udf
+
+usb-storage
+
+STEP 1 — modprobe.d config verify करें
+
+Example: cramfs
+
+grep cramfs /etc/modprobe.d/*
+
+Expected:
+
+install cramfs /bin/true
+
+अगर यह line है → module disabled है।
+
+STEP 2 — Check करें module currently loaded तो नहीं
+lsmod | grep cramfs
+Expected:
+(no output)
+
+
+STEP 3 — Test: module load करने की कोशिश करें (load नहीं होना चाहिए)
+modprobe cramfs 2>&1
+Expected:
+
+error
+
+permission denied
+
+or forced install failure
+Example output:
+modprobe: ERROR: could not insert 'cramfs': Operation not permitted
+✔ इसका मतलब module successfully disabled है।
+
+
+🔁 Repeat Steps for All Modules
+
+आप यही 3 commands हर module के लिए चलाएँ:
+
+freevxfs
+grep freevxfs /etc/modprobe.d/*
+lsmod | grep freevxfs
+modprobe freevxfs 2>&1
+
+hfs
+grep hfs /etc/modprobe.d/*
+lsmod | grep hfs
+modprobe hfs 2>&1
+
+hfsplus
+grep hfsplus /etc/modprobe.d/*
+lsmod | grep hfsplus
+modprobe hfsplus 2>&1
+
+jffs2
+grep jffs2 /etc/modprobe.d/*
+lsmod | grep jffs2
+modprobe jffs2 2>&1
+
+squashfs
+grep squashfs /etc/modprobe.d/*
+lsmod | grep squashfs
+modprobe squashfs 2>&1
+
+udf
+grep udf /etc/modprobe.d/*
+lsmod | grep udf
+modprobe udf 2>&1
+
+usb-storage
+grep usb-storage /etc/modprobe.d/*
+lsmod | grep usb-storage
+modprobe usb-storage 2>&1
