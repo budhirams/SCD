@@ -1,0 +1,18 @@
+Subject: Request for IP Pool Expansion for VLAN 10.177 (DR Setup Requirement)
+
+Dear Team,
+
+For the DR setup, the server team has informed us that VLAN 10.177 has reached IP exhaustion, due to which new servers cannot be assigned in the same VLAN.
+Since we may require additional resources in the future as well, I request you to please review and suggest the best possible option:
+
+Expansion of the existing subnet
+
+Addition of a secondary subnet within VLAN 10.177
+
+Any recommended future-proofing approach for capacity
+
+
+Kindly check and advise how we can proceed further to ensure DR setup readiness.
+
+Thanks & Regards,
+[Your Name]
