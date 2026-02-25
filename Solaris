@@ -1,0 +1,107 @@
+Restrict Core Dumps to Protected Directory
+Implementation Steps 
+To implement the recommendation, run the commands: 
+# chmod 700 /var/share/cores 
+# coreadm -g /var/share/cores/core_%n_%f_%u_%g_%t_%p \ -e log -e global -e gloabal-setid \ -d process -d proc-setid 
+
+If the local site chooses, dumping of core files can be completely disabled with the following command: 
+# coreadm -d global -d global-setid -d process -d proc-setid 
+
+
+
+
+8.2 Set Strong Password Creation Policies 
+
+# cd /etc/default 
+# awk '/PASSLENGTH=/ { $1 = "PASSLENGTH= 8" }; 
+/NAMECHECK=/ { $1 = "NAMECHECK=YES" }; 
+/HISTORY=/ { $1 = "HISTORY=10" }; 
+/MINDIFF=/ { $1 = "MINDIFF=3" }; 
+/MINALPHA=/ { $1 = "MINALPHA=2" }; 
+/MINUPPER=/ { $1 = "MINUPPER=1" }; 
+/MINLOWER=/ { $1 = "MINLOWER=1" }; 
+/MINNONALPHA=/ { $1 = "MINNONALPHA=1" }; 
+/MAXREPEATS=/ { $1 = "MAXREPEATS=0" }; 
+/WHITESPACE=/ { $1 = "WHITESPACE=YES" }; 
+/DICTIONDBDIR=/ { $1 = "DICTIONDBDIR=/var/passwd" }; 
+/DICTIONLIST=/ \ 
+{ $1 = "DICTIONLIST=/usr/share/lib/dict/words" }; 
+{ print }' passwd > passwd.CIS 
+# mv passwd.CIS passwd
+
+
+Enable a Warning Banner for the GNOME Service
+Implementation Steps 
+1. 
+Perform the following to implement the recommended state: 
+Edit the /etc/gdm/Init/Default file to add the following content before the last line 
+of the file. 
+/usr/bin/zenity --text-info --width=800 --height=300 \ --title="Security Message" --filename=/etc/issue 
+Note: If GUI is not used by the application then the control can be marked as not applicable 
+
+
+
+
+Check That Defined Home Directories Exist
+
+To implement the following, run the command: 
+for dir in `logins -ox | \ 
+awk -F: '($8 == "PS" && $1 != "root") { print $6 }'` 
+do 
+chmod g-w $dir 
+chmod o-rwx $dir 
+done
+
+# logins -xo | while read line; do user=`echo ${line} | awk -F: '{ print $1 }'` home=`echo ${line} | awk -F: '{ print $6 }'` if [ ! -d "${home}" ]; then echo ${user} fi done 
+_[Only uucp and nuucp should generate errors (as their home directories do not exist. Other entries should be verified for correctness.]_
+
+
+
+10.17 Check That Reserved UIDs Are Assigned to System Accounts 
+Implementation Steps 
+1. 
+To implement the recommendation, run the command: 
+logins -o | awk -F: '($2 == 0) { print $1 }' 
+This should return only the word “root”. 
+
+
+from excel:
+
+Perform the following to verify that the result is as recommended: 
+# logins -so | awk -F: '{ print $1 }' | while read user; 
+do found=0 
+for tUser in adm aiuser bin daemon dhcpserv dladm ftp gdm listen lp mysql netadm netcfg noaccess		
+  nobody nobody4 nuucp openldap pkg5srv postgres \ root smmsp svctag sys unknown uucp upnp \ webservd xvm zfssnap; 
+  do 		  if [ ${user} = ${tUser} ];
+  then 		  found=1 		  fi 	
+  done 		
+  if [ $found -eq 0 ]; 
+  then 		   echo "Invalid User with Reserved UID: ${user}" 		  fi 	
+  done 
+  (No output should be returned.)
+  
+  
+
+10.20   Find World Writable Files
+Implementation Steps 
+1. 
+Remove the following path components if they exist in the root users $PATH: 
+current working directory ('.') 
+empty directories („::‟) 
+a trailing path separator at the end of the $PATH (‘:’) 
+any directory with world or group -write permissions set 
+Note: If the files returned in the script output or audit file output are application-generated files Thus , for 
+application-generated files the users and groups are assigned by the application itself, Administrator cannot change 
+the user or group for these files. Hence, for these files created by the application, the control can be considered as not 
+applicable. 
+
+Perform the following to verify that the result is as recommended:	
+# find / \( -fstype nfs -o -fstype cachefs -o -fstype autofs \ 
+-o -fstype ctfs -o -fstype mntfs -o -fstype objfs \ 
+-o -fstype proc \) -prune -o -type f -perm -0002 
+-print(No output should be returned.)
+
+NOTE: The script above does a file transversal of all files under the "/" directory, 
+including NFS attached file systems, so running this search command may take quite some time.
+
+
