@@ -1,14 +1,1 @@
-logins -so | awk -F: '{ print $1 }' | while read user
-do
-    found=0
-    for tUser in adm aiuser bin daemon dhcpserv dladm ftp gdm listen lp mysql netadm netcfg noaccess nobody nobody4 nuucp openldap pkg5srv postgres root smmsp svctag sys unknown uucp upnp webservd xvm zfssnap
-    do
-        if [ "$user" = "$tUser" ]; then
-            found=1
-        fi
-    done
-
-    if [ $found -eq 0 ]; then
-        echo "Invalid User with Reserved UID: $user"
-    fi
-done
+logins -so | awk -F: '{print $1}' | while read user; do found=0; for tUser in adm aiuser bin daemon dhcpserv dladm ftp gdm listen lp mysql netadm netcfg noaccess nobody nobody4 nuucp openldap pkg5srv postgres root smmsp svctag sys unknown uucp upnp webservd xvm zfssnap; do [ "$user" = "$tUser" ] && found=1; done; [ $found -eq 0 ] && echo "Invalid User with Reserved UID: $user"; done
