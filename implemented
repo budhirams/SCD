@@ -1,0 +1,66 @@
+getting error in scd scan 
+An unexpected error occurred
+Error: Failed to download audit script and previous data - Failed to download audit data. Status: NotFound - Not Found
+
+after implementing below one , can you identify this 
+
+2.4.1.5.3	Audit Logoff
+2.4.1.5.6	Audit Special Logon
+2.4.1.7.2	Audit Authentication Policy Change
+2.4.1.7.3	Audit Authorization Policy Change
+2.4.1.9.3	Audit Security State Change
+2.4.1.9.4	Audit Security System Extension
+5.1.1	Prevent enabling lock screen camera
+5.1.2	Prevent enabling lock screen slide show
+5.4.1	Include command line in process creation events
+5.4.2	Continue experiences on this device
+5.4.4	Turn off access to the Store
+5.4.5	Turn off Internet Connection Wizard if URL connection is referring to Microsoft.com
+5.4.6	Turn off Internet download for Web publishing and online ordering wizards
+5.4.7	Turn off printing over HTTP
+5.4.8	Turn off Registration if URL connection is referring to Microsoft.com
+5.4.9	Turn off Search Companion content file updates
+5.4.10	Turn off the "Order Prints" picture task
+5.4.11	Turn off the "Publish to Web" task for files and folders
+5.4.12	Turn off the Windows Messenger Customer Experience Improvement Program
+5.4.13	Turn off Windows Customer Experience Improvement Program
+5.4.14	Turn off Windows Error Reporting
+5.4.15	Disallow copying of user input methods to the system account for sign-in
+5.4.16	Block user from showing account details on sign-in
+5.4.17	Do not display network selection UI
+5.4.18	Do not enumerate connected users on domain-joined computers
+5.4.20	Turn off app notifications on the lock screen
+5.4.21	Turn on convenience PIN sign-in
+5.4.22	Enable RPC Endpoint Mapper Client Authentication
+5.4.24	Enable/Disable PerfTrack
+5.4.25	Turn off the advertising ID
+5.4.26	Enable Windows NTP Server
+5.6	Set the default behavior for AutoRun
+5.6.1	Let Windows apps access account information
+5.6.2	Let Windows apps access call history
+5.6.3	Let Windows apps access contacts
+5.6.4	Let Windows apps access email
+5.6.5	Let Windows apps access location
+5.6.6	Let Windows apps access messaging
+5.6.7	Let Windows apps access motion
+5.6.8	Let Windows apps access the calendar
+5.6.9	Let Windows apps access the camera
+5.6.10	Let Windows apps access the microphone
+5.6.11	Let Windows apps access trusted devices
+5.6.12	Let Windows apps control radios
+5.6.14	Let Windows apps make phone calls
+5.6.15	Let Windows apps access notifications
+5.7	Turn off Autoplay
+5.8	Enumerate administrator accounts on elevation
+5.9	Toggle user control over Insider builds
+5.10	Application: Control Event Log behavior when the log file reaches its maximum size
+5.11	Application: Specify the maximum log file size (KB)
+5.12	Security: Control Event Log behavior when the log file reaches its maximum size
+5.13	Security: Specify the maximum log file size (KB)
+5.14	Setup: Control Event Log behavior when the log file reaches its maximum size
+5.15	Setup: Specify the maximum log file size (KB)
+5.16	System: Control Event Log behavior when the log file reaches its maximum size
+5.17	System: Specify the maximum log file size (KB)
+5.19	Turn off Data Execution Prevention for Explorer
+5.20	Turn off heap termination on corruption
+5.21	Turn off shell protocol protected mode
