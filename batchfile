@@ -1,0 +1,1 @@
+for %i in (10.x.x.x ...) do @echo %i >> result.txt & (echo quit | telnet %i 3389 >> result.txt)
