@@ -1,0 +1,7 @@
+Dear Team,
+
+As per the shared document guidelines, the required Uniken SFTP configuration is not mentioned. Currently, file sharing is being performed through the root user only. However, as per SCD requirements and RBIIT guidelines, root user SFTP access should be disabled.
+
+This activity is still pending. Kindly change the configuration to use a normal user for SFTP instead of the root user. Other applications such as NextGen and FastPlus are already using normal-user-based SFTP access.
+
+Also, as per RBIIT and SCD security guidelines, direct root login permission should be disabled. Therefore, please implement the required changes from your side accordingly.
