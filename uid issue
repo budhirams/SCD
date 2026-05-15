@@ -1,0 +1,5 @@
+Dear Team,
+As per SCD compliance requirements, system users should have UID values below 1000, and application users should not be configured under the system UID range. Kindly review the existing configuration and validate the same.
+Please assess and confirm any operational or application-level challenges that may arise in case UID modification is required. Prior to implementation, request you to perform proper testing and share the observations/results.
+Additionally, evidence will be required for compliance closure after successful validation and implementation.
+@OS Team: A global ticket has also been raised with Red Hat for further clarification/support. Kindly coordinate and provide updates accordingly
