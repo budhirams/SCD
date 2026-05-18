@@ -1,0 +1,4 @@
+2.1	2.1.1	Ensure mounting of the unused filesystems is disabled and separate partitions are created.	install lines present for cramfs, freevxfs, hfs, hfsplus, squashfs, udf, usb-storage; /tmp and /dev/shm with nodev,nosuid,noexec; /home with nodev.	"/etc/modprobe.d/scd13.conf:install cramfs /bin/true
+/etc/modprobe.d/scd13.conf:install squashfs /bin/true
+/etc/modprobe.d/scd13.conf:install udf /bin/true
+/etc/modprobe.d/scd13.conf:install usb-storage /bin/true,verify /dev/shm configureation for nosuid,nodev,noexec"	Block uncommon filesystems and apply restrictive mount flags	Reduce attack surface by preventing unused filesystem mounts and restricting writable areas.	Unneeded modules and permissive mounts allow code execution and data exfiltration.	Add 'install <fs> /bin/true' lines to /etc/modprobe.d/*.conf; set nodev/nosuid/noexec in /etc/fstab and remount /tmp,/home,/dev/shm accordingly.
