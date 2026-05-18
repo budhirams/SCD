@@ -1,0 +1,16 @@
+Dear Team,
+As discussed and validated during implementation activity, enabling restrictive/default deny firewall policy uniformly across all Oracle RAC interfaces caused Oracle ASM/RAC interconnect communication failure resulting in cluster instability and node eviction (ORA-29740 / IPC timeout).
+Further, Oracle support/DBA team has also confirmed that firewall or third-party filtering should not be enabled on RAC interconnect/private communication interfaces and recommended exclusion for:
+• RAC interconnect/private interfaces
+• ASM communication
+• GI binaries
+• RDBMS binaries
+• ADR home
+• ACFS/ASM-related communication paths
+Post validation, the following approach is recommended for secure and stable implementation:
+• Public/client-facing interfaces will remain under restricted firewall zone with only required ports/services allowed.
+• RAC private interconnect and ASM communication interfaces should remain under trusted/internal zone or excluded from restrictive filtering to avoid cluster heartbeat interruption.
+• firewalld service can remain enabled with controlled segmentation and explicit allow rules for public access.
+• Network-level controls such as VLAN segregation, upstream firewall policies, restricted routing, IDS/IPS, and access controls continue to provide compensating security controls.
+This approach aligns operational stability with security hardening requirements while preventing Oracle RAC service disruption.
+Hence, request you to review and modify the SCD observation/control applicability for Oracle RAC/ASM clustered servers accordingly.
