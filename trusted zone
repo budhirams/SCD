@@ -1,1 +1,159 @@
 Ensure default deny firewall policy	Loopback accept and anti-spoof rules present	Firewall default-zone : trusted,get-log-denied : off		A default deny all policy on connections ensures that any unconfigured network usage will be rejected.	With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to white list acceptable usage than to black list unacceptable usage.	Run the following command to implement a default DROP policy:   # nft chain [table family] [table name] [chain name] { policy drop \; }  Example:# nft chain inet filter input { policy drop \; }  # nft chain inet filter forward { policy drop \; }  1. Firewall Management: Ensure host-based firewall is enabled  Firewall service (firewalld) should be installed, enabled, and running Unrestricted traffic exposure  dnf install -y firewalld systemctl enable firewalld systemctl start firewalld  2. Firewall Architecture  Ensure only one firewall utility is active  Avoid conflict between iptables, nftables, firewalld Rule conflicts, traffic bypass systemctl disable iptables --now systemctl disable ip6tables –now 3. Backend Configuration  Ensure correct firewall backend  firewalld should use nftables (RHEL 8/9)  Misconfiguration, rule failure firewall-cmd --info-backend 4. Network Segmentation  Set default zone  Default zone should be restricted (e.g., public/internal)  Open network exposure firewall-cmd --set-default-zone=public 5. Access Control  Allow only required ports/services Only necessary ports (e.g., SSH, application ports) should be open Unauthorized access firewall-cmd --permanent --add-service=ssh firewall-cmd --permanent --add-port=[port number]/tcp firewall-cmd –reload 6. Loopback Protection  Secure loopback traffic  Allow loopback and prevent spoofingLocal spoofing attack firewall-cmd --permanent --zone=trusted --add-interface=lo firewall-cmd –reload7. Rule Persistence  Ensure firewall rules persist after reboot  All rules must be permanent  Rules lost after reboot firewall-cmd --runtime-to-permanent 8. Logging & Monitoring  Enable firewall logging  Log denied packets and suspicious activity  No visibility of attacks firewall-cmd --set-log-denied=all 9. Service Hardening  Remove unnecessary services  Disable unused ports/services  Increased attack surface firewall-cmd --permanent --remove-service=ftp firewall-cmd –reload 10. (Situational – Oracle RAC) Application-Specific Security  Ensure firewall does not disrupt cluster communicationFirewall rules must allow RAC interconnect and DB ports  Cluster failure, node eviction  Validate with DBA Allow required ports firewall-cmd --permanent --add-port=1521/tcp firewall-cmd --permanent --add-port=1630-1640/tcp firewall-cmd –reload 11. (Situational – Oracle RAC Alternative) Exception Handling  Disable host firewall if required for RAC stability  In RAC, host firewall may be disabled  Misconfiguration leads to outage systemctl stop firewalld systemctl disable firewalld systemctl status firewalld Strong network firewall (FAR), VLAN isolation, IDS/IPSNote:  • Apply host-based firewalls or network firewalls with port filtering tools on end systems, with a default-deny rule that drops all traffic except those services and ports that are explicitly allowed as per business requirement (IDS/IPS, SIEM monitoring, and strict access control mechanisms) then control will be safe• Ensure any single firewall configuration utility is in use. FirewallD should be configured or enabled either with iptables or NFtables.
+[root@cmp2-rep02-dr ~]# firewall-cmd --set-default-zone=public
+[root@cmp2-rep02-dr ~]# firewall-cmd --list-all  --zone=public
+public
+  target: default
+  icmp-block-inversion: no
+  interfaces: ens161 ens192 ens224
+  sources:
+  services: cockpit dhcpv6-client ssh
+  ports: 27041/tcp 22/tcp 4750/tcp 1522/tcp 8403/tcp 8400/tcp 4118/tcp 1530/tcp 1527/tcp 8096/tcp 8443/tcp
+  protocols:
+  forward: no
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks: timestamp-reply timestamp-request
+  rich rules:
+
+
+Errors:
+Fatal NI connect error 12543, connecting to:
+ (DESCRIPTION=(TCP_USER_TIMEOUT=1)(RECV_TIMEOUT=10)(CONNECT_TIMEOUT=60)(EXPIRE_TIME=1)(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=tcp)(HOST=10.176.121.230)(PORT=1525))
+ (ADDRESS=(PROTOCOL=tcp)(HOST=10.176.121.231)(PORT=1525)))(CONNECT_DATA=(SERVICE_NAME=+ASM_DATAGROUP1)(CID=(PROGRAM=oracle)(HOST=cmp2-rep02-dr)(USER=oracle))))
+
+  VERSION INFORMATION:
+        TNS for Linux: Version 19.0.0.0.0 - Production
+        Oracle Bequeath NT Protocol Adapter for Linux: Version 19.0.0.0.0 - Production
+        TCP/IP NT Protocol Adapter for Linux: Version 19.0.0.0.0 - Production
+  Version 19.30.0.0.0
+  Time: 13-MAY-2026 18:02:14
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12543
+
+TNS-12543: TNS:destination host unreachable
+    ns secondary err code: 12560
+    nt main err code: 513
+
+TNS-00513: Destination host unreachable
+    nt secondary err code: 113
+    nt OS err code: 0
+
+END OF SYSTEM STATE
+2026-05-13 18:02:19.211 :kjzdcrsh(): Performing trace dump for this instance
+2026-05-13 18:02:19.212 :kjzdlogdreq(): trace dump in directory=[cdmp_20260513180215], requested by (instance=2, osid=21776 (RBAL)), summary=[abnormal instance termination].
+2026-05-13 18:02:19.212 :kjzgtrdump(): Trace dumping is performing id=[cdmp_20260513180215]....
+2026-05-13 18:02:19.313 :kjzgtrdump(): Trace dumping is done
+
+/u01/app/grid/diag/tnslsnr/cmp2-rep02-dr/listener/alert/log.xml
+<msg time='2026-05-13T18:02:13.832+05:30' org_id='oracle' comp_id='tnslsnr'
+ type='UNKNOWN' level='16' host_id='cmp2-rep02-dr'
+ host_addr='10.177.39.241' pid='18333'>
+ <txt>13-MAY-2026 18:02:13 * service_died * LsnrAgt * 12537
+ </txt>
+</msg>
+<msg time='2026-05-13T18:05:12.904+05:30' org_id='oracle' comp_id='tnslsnr'
+ type='UNKNOWN' level='16' host_id='cmp2-rep02-dr'
+ host_addr='10.177.39.241' pid='18333'>
+ <txt>13-MAY-2026 18:05:12 * (CONNECT_DATA=(CID=(PROGRAM=emagent)(HOST=__jdbc__)(USER=oracle))(SID=repcmproddr2)) * (ADDRESS=(PROTOCOL=tcp)(HOST=10.177.39.241)(PORT=19384)) * establish * repcmproddr2 * 0
+ </txt>
+</msg>
+<msg time='2026-05-13T18:05:13.612+05:30' org_id='oracle' comp_id='tnslsnr'
+ type='UNKNOWN' level='16' host_id='cmp2-rep02-dr'
+ host_addr='10.177.39.241' pid='18333'>
+ <txt>No longer listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=10.177.39.241)(PORT=1522)))
+ </txt>
+</msg>
+<msg time='2026-05-13T18:05:13.612+05:30' org_id='oracle' comp_id='tnslsnr'
+ type='UNKNOWN' level='16' host_id='cmp2-rep02-dr'
+ host_addr='10.177.39.241' pid='18333'>
+ <txt>13-MAY-2026 18:05:13 * service_died * repcmproddr2 * 12537
+ </txt>
+</msg>
+<msg time='2026-05-13T18:07:49.182+05:30' org_id='oracle' comp_id='tnslsnr'
+ type='UNKNOWN' level='16' host_id='cmp2-rep02-dr'
+ host_addr='10.177.39.241' pid='18333'>
+ <txt>13-MAY-2026 18:07:49 * (CONNECT_DATA=(CID=(PROGRAM=)(HOST=cmp2-rep02-dr)(USER=grid))(COMMAND=status)(ARGUMENTS=64)(SERVICE=listener)(VERSION=318767104)) * status * 0
+ </txt>
+</msg>
+
+
+2026-05-13T18:12:36.737040+05:30
+PMON (ospid: 296912): terminating the instance due to ORA error 481
+2026-05-13T18:12:36.737948+05:30
+Cause - 'Instance is being terminated due to fatal process death (pid: 14, ospid: 296982, LMON)'
+2026-05-13T18:12:36.840432+05:30
+System state dump requested by (instance=2, osid=296912 (PMON)), summary=[abnormal instance termination]. error - 'Instance is terminating.'
+System State dumped to trace file /u01/app/grid/diag/asm/+asm/+ASM2/trace/+ASM2_diag_296972.trc
+2026-05-13T18:12:37.037387+05:30
+Dumping diagnostic data in directory=[cdmp_20260513181237], requested by (instance=2, osid=296912 (PMON)), summary=[abnormal instance termination].
+2026-05-13T18:12:38.142720+05:30
+Instance terminated by PMON, pid = 296912
+
+2026-05-13T18:02:14.175367+05:30
+
+
+***********************************************************************
+
+Fatal NI connect error 12543, connecting to:
+ (DESCRIPTION=(TCP_USER_TIMEOUT=1)(RECV_TIMEOUT=10)(CONNECT_TIMEOUT=60)(EXPIRE_TIME=1)(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=tcp)(HOST=10.176.121.230)(PORT=1525))(ADDRESS=(PROTOCOL=tcp)(HOST=10.176.121.231)(PORT=1525)))(CONNECT_DATA=(SERVICE_NAME=+ASM_DATAGROUP1)(CID=(PROGRAM=oracle)(HOST=cmp2-rep02-dr)(USER=oracle))))
+
+  VERSION INFORMATION:
+        TNS for Linux: Version 19.0.0.0.0 - Production
+        Oracle Bequeath NT Protocol Adapter for Linux: Version 19.0.0.0.0 - Production
+        TCP/IP NT Protocol Adapter for Linux: Version 19.0.0.0.0 - Production
+  Version 19.30.0.0.0
+  Time: 13-MAY-2026 18:02:14
+  Tracing not turned on.
+  Tns error struct:
+    ns main err code: 12543
+
+TNS-12543: TNS:destination host unreachable
+    ns secondary err code: 12560
+    nt main err code: 513
+
+TNS-00513: Destination host unreachable
+    nt secondary err code: 113
+    nt OS err code: 0
+2026-05-13T18:05:12.139301+05:30
+IPC Send timeout to 1.0 inc 26 for msg type 65521 from opid 23
+2026-05-13T18:05:12.140321+05:30
+Suppressed nested communications reconfiguration: instance_number 1 from LMD0 (ospid: 25370)
+Detected an inconsistent instance membership by instance 1
+Errors in file /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/trace/repcmproddr2_lmon_25350.trc  (incident=624178):
+ORA-29740: evicted by instance number 1, group incarnation 28
+Incident details in: /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/incident/incdir_624178/repcmproddr2_lmon_25350_i624178.trc
+2026-05-13T18:05:12.627773+05:30
+Errors in file /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/trace/repcmproddr2_dia0_25323_base_1.trc:
+ORA-27508: IPC error sending a message
+2026-05-13T18:05:12.835866+05:30
+IPC Send timeout to 1.3 inc 26 for msg type 8 from opid 127
+2026-05-13T18:05:12.836301+05:30
+IPC Send timeout: Terminating pid 127 osid 228757
+Process termination requested for pid 228757 [source = rdbms], [info = 2] [request issued by pid: 228757, uid: 54331]
+2026-05-13T18:05:13.202394+05:30
+Use ADRCI or Support Workbench to package the incident.
+See Note 411.1 at My Oracle Support for error and packaging details.
+2026-05-13T18:05:13.202784+05:30
+Errors in file /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/trace/repcmproddr2_lmon_25350.trc:
+ORA-29740: evicted by instance number 1, group incarnation 28
+Errors in file /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/trace/repcmproddr2_lmon_25350.trc  (incident=624179):
+ORA-29740 [] [] [] [] [] [] [] [] [] [] [] []
+Incident details in: /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/incident/incdir_624179/repcmproddr2_lmon_25350_i624179.trc
+2026-05-13T18:05:13.609222+05:30
+CKPT (ospid: 25434): terminating the instance due to ORA error 481
+2026-05-13T18:05:13.610022+05:30
+Cause - 'Instance is being terminated due to dlm error
+'
+2026-05-13T18:05:19.086843+05:30
+Errors in file /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/trace/repcmproddr2_diag_25279.trc:
+ORA-27508: IPC error sending a message
+2026-05-13T18:05:19.087343+05:30
+System state dump requested by (instance=2, osid=25434 (CKPT)), summary=[abnormal instance termination]. error - 'Instance is terminating.
+'
+System State dumped to trace file /u01/app/oracle/diag/rdbms/repcmproddr/repcmproddr2/trace/repcmproddr2_diag_25279.trc
+2026-05-13T18:05:22.109435+05:30
+Dumping diagnostic data in directory=[cdmp_20260513180518], requested by (instance=2, osid=25434 (CKPT)), summary=[abnormal instance termination].
+2026-05-13T18:05:23.735580+05:30
+Instance terminated by CKPT, pid = 25434
