@@ -1,0 +1,91 @@
+
+State    Type    Rebal  Sector  Logical_Sector  Block       AU  Total_MB  Free_MB  Req_mir_free_MB  Usable_file_MB  Offline_disks  Voting_files  Name
+MOUNTED  EXTERN  N         512             512   4096  4194304   4349924  3578464                0         3578464              0             N  DATAGROUP1/
+MOUNTED  EXTERN  N         512             512   4096  4194304   2047984  1217248                0         1217248              0             N  FRAGROUP/
+MOUNTED  EXTERN  N         512             512   4096  1048576    511999    10085                0           10085              0             N  GGDATA/
+MOUNTED  HIGH    N         512             512   4096  4194304     51180    49604            20472            9710              0             Y  OCRVOT/
+MOUNTED  EXTERN  N         512             512   4096  4194304     51196    37688                0           37688              0             N  REDOGROUP/
+MOUNTED  EXTERN  N         512             512   4096  4194304    102396    82704                0           82704              0             N  TEMPGROUP/
+[root@cmp2-db02-dr ~]# srvctl status listener
+Listener LISTENER is enabled
+Listener LISTENER is running on node(s): cmp2-db03-dr,cmp2-db01-dr,cmp2-db02-dr
+Listener LISTENER_REP_DG is enabled
+Listener LISTENER_REP_DG is running on node(s): cmp2-db03-dr,cmp2-db01-dr,cmp2-db02-dr
+[root@cmp2-db02-dr ~]# srvctl status asm\
+> ^C
+[root@cmp2-db02-dr ~]# srvctl status asm
+ASM is running on cmp2-db03-dr,cmp2-db01-dr,cmp2-db02-dr
+[root@cmp2-db02-dr ~]# firewall-cmd --get-active-zones
+libvirt
+  interfaces: virbr0
+trusted
+  interfaces: ens161 ens192 ens193 ens224
+
+
+
+[root@cmp2-db02-dr ~]# nft list ruleset | grep drop
+# Warning: table ip filter is managed by iptables-nft, do not touch!
+                iifname != "lo" ip saddr 127.0.0.0/8 counter packets 0 bytes 0 drop
+                type filter hook forward priority filter; policy drop;
+# Warning: table ip mangle is managed by iptables-nft, do not touch!
+# Warning: table ip nat is managed by iptables-nft, do not touch!
+                type filter hook input priority filter; policy drop;
+                iifname != "lo" ip6 saddr ::1 counter packets 0 bytes 0 drop
+                type filter hook forward priority filter; policy drop;
+                meta nfproto ipv6 fib saddr . mark . iif oif missing drop
+                ct state invalid drop
+                ct state invalid drop
+[root@cmp2-db02-dr ~]# oi
+oidca        oidprovtool  oifcfg       oifcfg.bin   oifcfg_ifls
+[root@cmp2-db02-dr ~]# oi
+oidca        oidprovtool  oifcfg       oifcfg.bin   oifcfg_ifls
+[root@cmp2-db02-dr ~]# oifcfg getif
+ens161  10.176.124.0  global  cluster_interconnect,asm
+ens192  10.177.38.0  global  public
+[root@cmp2-db02-dr ~]# crsc
+crscdpd      crscdpd.bin  crsctl       crsctl.bin
+[root@cmp2-db02-dr ~]# crsctl check cluster -all
+**************************************************************
+cmp2-db01-dr:
+CRS-4537: Cluster Ready Services is online
+CRS-4529: Cluster Synchronization Services is online
+CRS-4533: Event Manager is online
+**************************************************************
+cmp2-db02-dr:
+CRS-4537: Cluster Ready Services is online
+CRS-4529: Cluster Synchronization Services is online
+CRS-4533: Event Manager is online
+**************************************************************
+cmp2-db03-dr:
+CRS-4537: Cluster Ready Services is online
+CRS-4529: Cluster Synchronization Services is online
+CRS-4533: Event Manager is online
+**************************************************************
+[root@cmp2-db02-dr ~]# systemctl net.ipv4.ip_forward
+Unknown operation net.ipv4.ip_forward.
+[root@cmp2-db02-dr ~]# sysctl net.ipv4.ip_forward
+net.ipv4.ip_forward = 0
+[root@cmp2-db02-dr ~]# sysctl net.ipv4.conf.default.rp_filter
+net.ipv4.conf.default.rp_filter = 1
+[root@cmp2-db02-dr ~]# for i in /proc/sys/net/ipv
+ipv4/ ipv6/
+[root@cmp2-db02-dr ~]# for i in /proc/sys/net/ipv4/conf/*/rp_filter ; do echo "$i = $(cat $i)";done
+/proc/sys/net/ipv4/conf/all/rp_filter = 1
+/proc/sys/net/ipv4/conf/default/rp_filter = 1
+/proc/sys/net/ipv4/conf/ens161/rp_filter = 1
+/proc/sys/net/ipv4/conf/ens192/rp_filter = 1
+/proc/sys/net/ipv4/conf/ens193/rp_filter = 1
+/proc/sys/net/ipv4/conf/ens224/rp_filter = 1
+/proc/sys/net/ipv4/conf/lo/rp_filter = 0
+/proc/sys/net/ipv4/conf/virbr0/rp_filter = 1
+[root@cmp2-db02-dr ~]# ip route
+default via 10.177.38.1 dev ens192 proto static metric 100
+10.176.80.0/23 dev ens193 proto kernel scope link src 10.176.80.40 metric 102
+10.176.120.0/23 dev ens224 proto kernel scope link src 10.176.121.217 metric 103
+10.176.124.0/23 dev ens161 proto kernel scope link src 10.176.124.138 metric 101
+10.177.38.0/23 dev ens192 proto kernel scope link src 10.177.39.226 metric 100
+10.191.252.186 via 10.176.124.1 dev ens161 proto static metric 101
+10.191.252.187 via 10.176.124.1 dev ens161 proto static metric 101
+10.191.252.188 via 10.176.124.1 dev ens161 proto static metric 101
+169.254.0.0/19 dev ens161 proto kernel scope link src 169.254.5.67
+192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1 linkdown
