@@ -1,0 +1,14 @@
+Dear Team,
+As part of the SCD compliance activity, the parameter net.ipv4.ip_forward was reviewed on the registry server <SERVER_HOSTNAME>.
+It has been observed that Podman container networking is configured and actively used on this server. The server is using bridge/container network interfaces for registry and container communication.
+The following outputs confirm the dependency:
+podman network ls
+ip route
+ip a | grep -i podman
+Disabling IP forwarding by setting:
+net.ipv4.ip_forward = 0
+impacts container communication, registry accessibility, and Podman network functionality.
+Hence, the current configuration:
+net.ipv4.ip_forward = 1
+is required for application/container networking dependency and operational functionality of the server.
+Requesting exception/waiver approval for this observation for the mentioned server.
