@@ -1,0 +1,19 @@
+------------------Modify Network Parameters ------------------------------
+net.ipv4.conf.default.send_redirects=0 
+net.ipv4.ip_forward=0
+net.ipv4.conf.all.send_redirects=0 
+net.ipv4.icmp_ignore_bogus_error_responses=1
+net.ipv4.conf.all.rp_filter=1
+net.ipv4.conf.default.rp_filter=1
+net.ipv4.tcp_syncookies=1
+sysctl --system
+
+[root@cmp2-db03-dr bin]# sysctl net.ipv4.ip_forward
+net.ipv4.ip_forward = 0
+[root@cmp2-db03-dr bin]# cat /proc/sys/net/ipv4/ip_forward
+0
+grep -R "net.ipv4.ip_forward" /etc/sysctl.conf /etc/sysctl.d/ /usr/lib/sysctl.d/
+/etc/sysctl.conf:net.ipv4.ip_forward = 0
+/etc/sysctl.d/99-sysctl.conf:net.ipv4.ip_forward = 0
+
+systemctl status libvirtd  ----inactive
