@@ -1,0 +1,14 @@
+Dear Team,
+As per the Red Hat solution for the Mirror Registry used with OpenShift, the parameter net.ipv4.ip_forward must be enabled (1) on the OS level. Red Hat has documented that when IP forwarding is disabled (0), image pull operations from the mirror registry may fail with connection timeout errors, causing communication issues between OpenShift nodes and the mirror registry.
+The observed issue includes:
+Image pull failures with I/O timeout.
+Inability of cluster nodes to connect to the mirror registry.
+Registry communication failures despite no firewall restrictions.
+Red Hat's recommended resolution is:
+Bash
+net.ipv4.ip_forward=1
+and apply the change using:
+Bash
+sysctl -p
+Therefore, setting net.ipv4.ip_forward=0 (disabled) is not supported for this Mirror Registry implementation, as it may impact registry accessibility and image pull operations. An exception or approval may be required if the SCD policy mandates disabling IP forwarding on this server.
+Please review and advise on the required exception process.
