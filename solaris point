@@ -128,3 +128,8 @@ sshd, ikeuser, and _ntp are locked system accounts and are not available for int
 _polkitd is a PolicyKit service account required for operating system functionality.
 The intent of this control is to ensure that reserved UIDs are not assigned to unauthorized or custom user accounts. In this case, all identified accounts are legitimate OS-managed service accounts utilizing reserved UIDs by design. No unauthorized user accounts with reserved UIDs were identified on the server.
 Based on the verification performed, the observation appears to be generated due to the presence of valid Solaris service accounts rather than non-compliant user accounts. Kindly review and confirm closure of the observation or advise if any additional action is required.
+
+
+
+
+find / \( -fstype nfs -o -fstype cachefs -o -fstype autofs -o -fstype ctfs -o -fstype mntfs -o -fstype objfs -o -fstype proc \) -prune -o -type f \( -perm -4000 -o -perm -2000 \) -print
