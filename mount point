@@ -17,3 +17,19 @@ export TMPDIR=/u01/cvu_tmp
 export CV_DESTLOC=/u01/cvu_tmp
 Kindly confirm whether Oracle OEM/CVU activities can utilize an alternate mount point (such as /u01) instead of /tmp. This approach would allow us to maintain the security configuration on /tmp while providing a suitable location for Oracle temporary execution requirements.
 Please share your confirmation or any OEM-specific recommendations.
+
+
+
+
+'/tmp/' ...FAILED
+PRVG-1901 : failed to setup CVU remote execution framework directory
+"/tmp/CVU_19_grid_2026-06-02_15-41-21_3616631/" on nodes "cmp2-rep02-dr"
+
+PRVH-0185 : Path "/tmp/CVU_19_grid_2026-06-02_15-41-21_3616631/" does not allow execution on node "cmp2-rep02-dr".
+Cannot run program "/tmp/CVU_19_grid_2026-06-02_15-41-21_3616631/exectask.sh":
+error=13, Permission denied
+
+
+cmp2-rep02-dr: PRVH-0516 : failed to retrieve CVU remote execution framework version from node "cmp2-rep02-dr" during an attempt to setup remote execution framework directory "/tmp/CVU_19_grid_2026-06-02_15-41-21_3616631/"
+                     cmp2-rep02-dr : /bin/sh: /tmp/CVU_19_grid_2026-06-02_15-41-21_3616631//exectask.sh:Permission denied
+               cmp2-rep02-dr : /bin/sh: /tmp/CVU_19_grid_2026-06-02_15-41-21_3616631//exectask.sh: Permission denied
