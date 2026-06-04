@@ -2,3 +2,18 @@
 /etc/modprobe.d/scd13.conf:install squashfs /bin/true
 /etc/modprobe.d/scd13.conf:install udf /bin/true
 /etc/modprobe.d/scd13.conf:install usb-storage /bin/true,verify /dev/shm configureation for nosuid,nodev,noexec"	Block uncommon filesystems and apply restrictive mount flags	Reduce attack surface by preventing unused filesystem mounts and restricting writable areas.	Unneeded modules and permissive mounts allow code execution and data exfiltration.	Add 'install <fs> /bin/true' lines to /etc/modprobe.d/*.conf; set nodev/nosuid/noexec in /etc/fstab and remount /tmp,/home,/dev/shm accordingly.
+
+
+
+
+Dear Team,
+The default /tmp filesystem is mounted with the noexec option as per security compliance requirements. During Oracle OEM/CVU operations, temporary files and scripts may need to be executed, which can cause failures when using /tmp.
+As an alternative, we propose using a dedicated temporary directory on another mount point:
+mkdir -p /u01/cvu_tmp
+chmod 777 /u01/cvu_tmp
+
+export TMP=/u01/cvu_tmp
+export TMPDIR=/u01/cvu_tmp
+export CV_DESTLOC=/u01/cvu_tmp
+Kindly confirm whether Oracle OEM/CVU activities can utilize an alternate mount point (such as /u01) instead of /tmp. This approach would allow us to maintain the security configuration on /tmp while providing a suitable location for Oracle temporary execution requirements.
+Please share your confirmation or any OEM-specific recommendations.
