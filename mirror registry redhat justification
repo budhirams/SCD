@@ -1,0 +1,62 @@
+Dear Team,
+As per the Red Hat solution for the Mirror Registry used with OpenShift, the parameter net.ipv4.ip_forward must be enabled (1) on the OS level. Red Hat has documented that when IP forwarding is disabled (0), image pull operations from the mirror registry may fail with connection timeout errors, causing communication issues between OpenShift nodes and the mirror registry.
+The observed issue includes:
+Image pull failures with I/O timeout.
+Inability of cluster nodes to connect to the mirror registry.
+Registry communication failures despite no firewall restrictions.
+Red Hat's recommended resolution is:
+Bash
+net.ipv4.ip_forward=1
+and apply the change using:
+Bash
+sysctl -p
+Therefore, setting net.ipv4.ip_forward=0 (disabled) is not supported for this Mirror Registry implementation, as it may impact registry accessibility and image pull operations. An exception or approval may be required if the SCD policy mandates disabling IP forwarding on this server.
+Please review and advise on the required exception process.
+
+
+
+
+
+
+
+
+Please refer to the trail mail, raised a ticket to RedHat for below control point : 
+
+2.27.1. Modify Network Parameters
+net.ipv4.ip_forward = 1
+
+scd requirement was set net.ipv4.ip_forward = 0
+
+but it is registry server using bridge network we cant implement as share mail to scd team
+
+
+
+but they recommended below step if we are implement below can we get some challenge or not?
+
+Compensatory Control:
+ 
+Technical Mitigation Controls (Host-Level Packet Filtering)
+Strict firewalld Forwarding Policy: Implement an explicit forward zone policy in firewalld to block all forwarded traffic by default, except for explicitly defined sources and destinations.
+Interface-Specific Restrictions: Bind the forwarding permissions strictly to the Podman bridge interface (e.g., podman0 or custom CNI bridge) and the primary physical interface (e.g., eth0). Run the following commands to isolate forwarded traffic:
+ 
+# Ensure default forward policy is set to DROP
+firewalld --permanent --direct --add-rule ipv4 filter FORWARD 0 -i eth0 -o podman0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+firewalld --permanent --direct --add-rule ipv4 filter FORWARD 0 -i podman0 -o eth0 -j ACCEPT
+firewalld --permanent --direct --add-rule ipv4 filter FORWARD 1 -j DROP
+firewalld –reload
+ 
+Network Parameter Tightening: Disable reverse path filtering exceptions and source routing to prevent spoofing attacks on the routing engine by enforcing strict reverse path filtering in /etc/sysctl.d/99-security-hardening.conf:
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.conf.all.send_redirects = 0 net.ipv4.conf.all.accept_redirects = 0
+Procedural and Architectural Controls (Segmentation & Monitoring)
+ 
+Network Micro-Segmentation: Place the registry server in a dedicated, isolated DeMilitarized Zone (DMZ) or restricted Tools VLAN. Configure upstream network firewalls (e.g., Palo Alto / Fortinet) with strict access control lists (ACLs) allowing ingress traffic to ports 443 or 5000 solely from authorized OpenShift cluster nodes.
+ 
+Continuous Audit Logging & Monitoring: Enable Linux Audit Daemon (auditd) logging for any runtime modifications to network parameters and host routing tables. Add the following rules to /etc/audit/rules.d/audit.rules:
+-w /proc/sys/net/ipv4/ip_forward -p wa -k sysctl_network
+-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-localization
+ 
+SIEM Integration: Forward all host syslog and firewalld dropped-packet logs to the Centralized SIEM (e.g., Splunk / QRadar). Configure real-time alerts for any unauthorized connection attempts traversing the FORWARD chain.
