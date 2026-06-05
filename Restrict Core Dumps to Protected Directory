@@ -28,3 +28,44 @@ root@cmphdb14:~# coreadm | egrep "global core|per-process"
        per-process core dumps: disabled
  per-process setid core dumps: disabled
      global core dump logging: enabled
+
+
+
+
+
+
+
+
+
+Dear Team,
+
+The core dump configuration has been verified on the Solaris server.
+
+Verification results:
+
+- Global core file pattern: "/var/cores/core_%n_%f_%u_%g_%t_%p"
+- Global core dumps: Enabled
+- Per-process core dumps: Disabled
+- Global setid core dumps: Enabled
+- Per-process setid core dumps: Disabled
+- Global core dump logging: Enabled
+
+Additionally, "/var/cores" is configured as a symbolic link to "/var/share/cores".
+
+/var/cores -> /var/share/cores
+
+The target directory permissions have been verified as:
+
+drwx------ root root /var/share/cores
+
+and
+
+ls -ldL /var/cores
+drwx------ root root
+
+Therefore, the effective core dump storage directory is protected with the required permissions (700), and the control intent is satisfied. Any non-compliance reported against "/var/cores" is likely due to the scanner evaluating the symbolic link itself rather than the target directory.
+
+Kindly review and consider the observation for closure.
+
+Thanks & Regards,
+[Your Name]
