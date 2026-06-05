@@ -1,0 +1,17 @@
+Phase	Activity	Owner	Dependency	Timeline	Status	Remarks									
+Assessment	Identify current Java versions on all servers	Infra Team		Day 1	Open										
+Assessment	Check application compatibility with target Java version	App Team	Vendor/App approval	Day 1-2	Open										
+Planning	Prepare upgrade and rollback plan	Infra Team		Day 2	Open										
+Planning	Obtain change approvals	Change Manager	CAB Approval	Day 3	Open										
+Pre-Implementation	Take backups/snapshots	Infra Team		Day 4	Open										
+Pre-Implementation	Download approved Java package	Infra Team		Day 4	Open										
+Implementation	Install/Upgrade Java in UAT	Infra Team		Day 5	Open										
+Validation	Application testing in UAT	App Team		Day 5-6	Open										
+Implementation	Schedule Production downtime	Infra Team	Business approval	Day 7	Open										
+Implementation	Upgrade Java in Production	Infra Team		Day 7	Open										
+Validation	Validate application services	App Team		Day 7	Open										
+Validation	Monitor logs and performance	Infra/App Team		Day 7-8	Open										
+Closure	Close change and update documentation	Infra Team		Day 8	Open										
+															
+															
+															
