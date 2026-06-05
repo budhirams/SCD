@@ -114,6 +114,27 @@ root root 700 /var/share/cores,global core file pattern: /var/cores/core_%n_%f_%
 
 
 
+root@cmpmtxn74:~# ls -ld /var/share/cores
+drwx------   2 root     root           3 Sep 28  2024 /var/share/cores
+root@cmpmtxn74:~# ls -ld /var/cores
+lrwxrwxrwx   1 root     sys           18 Aug  3  2016 /var/cores -> ../var/share/cores
+root@cmpmtxn74:~# chown root:sys ^C
+root@cmpmtxn74:~# ls -ld /var/share/cores
+drwx------   2 root     root           3 Sep 28  2024 /var/share/cores
+root@cmpmtxn74:~# ls -ld /var/cores
+lrwxrwxrwx   1 root     sys           18 Aug  3  2016 /var/cores -> ../var/share/cores
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
