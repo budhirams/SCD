@@ -39,3 +39,13 @@ Kindly review and consider the observation for closure.
 
 Thanks & Regards,
 [Your Name]
+
+
+
+
+
+
+
+
+Not Applicable. Control is already implemented and compliant. IPv4 source routed packet forwarding is disabled. IPv4 forwarding and IPv6 forwarding are disabled. The property is not available for IPv6 in the current Solaris version; however, IPv6 forwarding and routing are disabled, satisfying the security objective.
+No customization required. Existing configuration meets the control requirement.
