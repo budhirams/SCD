@@ -1,0 +1,98 @@
+As part of the SCD compliance review, we evaluated the control "Disable Local-only RPC Port Mapping Service (svc:/network/rpc/bind)" on the Solaris server.
+Upon verification, it was observed that the server is actively utilizing NFS-related services, which depend on RPC functionality. The following outputs confirm the dependency:
+
+NFS Services:
+
+svc:/network/nfs/client:default – Online
+svc:/network/nfs/nlockmgr:default – Online
+svc:/network/nfs/mapid:default – Online
+
+RPC Registration:
+rpcbind service is active on port 111 (TCP/UDP)
+
+NFS Lock Manager (nlockmgr) is registered through RPC
+
+As per the control description, RPC services should be disabled only when they are not required. In this case, disabling svc:/network/rpc/bind may impact NFS communication, file system access, mount operations, and file locking functionality, which could affect application and business operations.
+Therefore, this compliance point cannot be implemented without introducing operational risk.
+
+We request approval for an exception/deviation for this control. Compensating controls such as network-level access restrictions, firewall policies, and continuous monitoring can be considered to mitigate the associated security risk.
+
+Please review and advise on this point.
+
+ Evidence : 
+
+
+
+
+
+
+
+
+Section
+Sub Section
+Title
+Description
+Observation
+Compliance
+Criticality
+Rationale Statement
+Remediation Procedure
+Audit Procedure
+Recommended Value
+2
+2.11
+Disable Local-only RPC Port Mapping Service
+Remote Procedure Call (RPC) is used by many services within the Solaris 11 operating system. Some of these services allow external connections to use the service (e.g. NFS, NIS). By default, the Solaris 11 OS configures this service to be local only.
+svc:/network/rpc/bind:default online
+NO
+High
+RPC-based services typically have weak or non-existent authentication and yet may share very sensitive information, which is vulnerable to network traffic sniffers. Unless one of these services is required on this host, RPC-based tools should be fully disabled.
+To disable this service, run the following command: # svcadm disable svc:/network/rpc/bind            If the goal is to restrict access to this service, but not disable it completely,     consider using a host-based firewall such as ipfilter(5) to control what hosts are allowed to access this            service. Alternatively, TCP Wrappers support, which controls host access     and connection auditing, can be enabled. TCP Wrappers is discussed in the next section.
+Perform the following and verify that the result is as shown: # svcs -Ho state svc:/network/rpc/bind disabled
+svc:/network/rpc/bind should be disa
+
+
+
+please fill the form 
+
+Request for SCD Customization:
+Requesting Department:	IT-CMP
+Name of Application/Tool/Device	CMP FASTPLUS
+Brief of Application/Tool/Device	
+Application Version Details	
+Operating System Name & Version	Solaris 11.4
+
+SCD version No.	CIS_Oracle_Solaris_11.4
+SCD Type (OS/ DB/ Application Server/ Web Server/ Network Device/ Security Device/ Middleware/ Other Appliances or Devices)	OS
+SCD Title and Details	
+Type of Customization (Application Specific / Global)	
+Control/Controls for which Customization is required, (list may be attached as Annexure)	
+Risk categorization of controls, if any	
+Challenges in implementing controls/ Reason for Customization (Please provide Business Requirements and Technical Reasons with evidence)	
+Changes proposed under Customization	
+Whether customization for the control/Controls approved in any older versions of SCD. (Details or Approval may be attached)	
+Compensatory Controls, if any
+	
+IP of the UAT Server	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Risk Analysis from IS&SP including Residual Risk if any – SCD Team	
+SPOC Details	BUDHIRAM SAHANI
+
+and generate doc
