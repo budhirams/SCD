@@ -2,3 +2,89 @@
 User xvm has a reserved UID (60).
 User mysql has a reserved UID (70).
 User _polkitd has a reserved UID (63)."	If a user is assigned a UID that is in the reserved range, even if it is not presently in use, security exposures can arise if a subsequently installed application uses the same UID.	Correct or justify any items discovered in the Audit step. Determine if there are any accounts using these reserved UIDs, and work with their owner to determine the best course of action in accordance with site policy.	"Perform the following to verify that the result is as recommended: # logins -so | awk -F: '{ print $1 }' | while read user; do found=0 for tUser in adm aiuser bin daemon dhcpserv dladm ftp gdm listen lp mysql netadm netcfg noaccess		  nobody nobody4 nuucp openldap pkg5srv postgres \ root smmsp svctag sys unknown uucp upnp \ webservd xvm zfssnap; do 		  if [ ${user} = ${tUser} ]; then 		  found=1 		  fi 		  done 		  if [ $found -eq 0 ]; then 		  echo ""Invalid User with Reserved UID: ${user}"" 		  fi 		  done (No output should be returned.)"	No Output
+
+
+root@cmphdb14:/tmp# sh  uid-script.sh
+Invalid User with Reserved UID: sshd
+Invalid User with Reserved UID: _polkitd
+Invalid User with Reserved UID: ikeuser
+Invalid User with Reserved UID: _ntp
+
+
+
+Further verification was performed using the id command and /etc/shadow entries. The identified accounts were confirmed to be Solaris operating system service accounts and not application or custom user accounts.
+
+Additionally:
+sshd, ikeuser, and _ntp are locked system accounts and are not available for interactive login.
+_polkitd is a PolicyKit service account required for operating system functionality.
+
+The intent of this control is to ensure that reserved UIDs are not assigned to unauthorized or custom user accounts. In this case, all identified accounts are legitimate OS-managed service accounts utilizing reserved UIDs by design. No unauthorized user accounts with reserved UIDs were identified on the server.
+Based on the verification performed, the observation appears to be generated due to the presence of valid Solaris service accounts rather than non-compliant user accounts.
+
+
+Dear Sir,
+
+Please find /etc/shadow details, as discussed.
+
+These are system user with LK and NP properties; this point should be compliance.
+
+
+
+based on the above fill the below form for customization
+
+SCD Customization request for Approval
+Annexure B
+Request for SCD Customization:
+Requesting Department:	IT-CMP
+Name of Application/Tool/Device	CMP FASTPLUS
+Brief of Application/Tool/Device	
+Application Version Details	
+Operating System Name & Version	Solaris 11.4
+
+SCD version No.	CIS_Oracle_Solaris_11.4
+SCD Type (OS/ DB/ Application Server/ Web Server/ Network Device/ Security Device/ Middleware/ Other Appliances or Devices)	OS
+SCD Title and Details	
+Type of Customization (Application Specific / Global)	Not required
+Control/Controls for which Customization is required, (list may be attached as Annexure)	NA
+Risk categorization of controls, if any	Medium
+Challenges in implementing controls/ Reason for Customization (Please provide Business Requirements and Technical Reasons with evidence)	
+Changes proposed under Customization	
+Whether customization for the control/Controls approved in any older versions of SCD. (Details or Approval may be attached)	
+Compensatory Controls, if any
+	
+IP of the UAT Server	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Risk Analysis from IS&SP including Residual Risk if any – SCD Team	
+SPOC Details	BUDHIRAM SAHANI
+We confirm that, UAT setup is ready for Testing the customized SCD in Our Department.                                                                                                
+
+                                                               Name: BUDHIRAM SAHANI
+                                                            Designation: DEPUTY MANAGER (SYSTEMS)
+
+Enclosures: 
+1.	Copy of SCD 
+2.	List of controls under customization
+3.	Any approved customization for controls in any previous versions
+4.	Technical Documentation/ Hardening Guidelines/ Security best Practices from OEM
+Note: The IT-AO should ensure that all necessary pre-requisites such as onboarding of devices in ITSAM, PAM, SCGuard, Group Policy updates (in case of Windows devices), Firewall Access Requests and user with necessary privileges are in place.
+
+
+
+
+ 
+
