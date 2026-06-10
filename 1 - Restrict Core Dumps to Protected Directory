@@ -1,1 +1,23 @@
 Restrict Core Dumps to Protected Directory		The action described in this section creates a protected directory to store core dumps and also causes the system to create a log entry whenever a regular process dumps core.	global core file pattern: /var/cores/core_%n_%f_%u_%g_%t_%p	NO	Low	Core dumps, particularly those from set-UID and set-GID processes, may contain sensitive data.	"To implement the recommendation, run the commands:	# chmod 700 /var/share/cores# coreadm -g /var/share/cores/core_%n_%f_%u_%g_%t_%p \ -e log -e global -e global-setid \ -d process -d proc-setid 	If the local site chooses, dumping of core files can be completely disabled with the following command:	# coreadm -d global -d global-setid -d process -d proc-setid"	"global core file pattern: /var/cores/core_%n_%f_%u_%g_%t_%p 			global core file content: default 			init core file pattern: core 			init core file content: default 			global core dumps: enabled per-process core dumps: disabled 			global setid core dumps: enabled 			per-process setid core dumps: disabled 			global core dump logging: enabled									/var/cores 		      Permission : drwx------		      Owner      : root		      Group      : root"
+
+
+root@cmphdb14:~# coreadm
+     global core file pattern: /var/cores/core_%n_%f_%u_%g_%t_%p
+     global core file content: default
+kernel zone core file pattern: /var/cores/%z/%f.*
+       init core file pattern: core
+       init core file content: default
+            global core dumps: enabled
+       kernel zone core dumps: enabled
+       per-process core dumps: disabled
+      global setid core dumps: enabled
+ per-process setid core dumps: disabled
+     global core dump logging: enabled
+        diagnostic core dumps: enabled
+             retention policy: summary
+        core diagnostic alert: enabled
+    automated service request: enabled
+root@cmphdb14:~# ls -ld /var/share/co
+compliance/ cores/
+root@cmphdb14:~# ls -ld /var/share/cores/
+drwx------   2 root     root           9 Jun 10 09:00 /var/share/cores/
