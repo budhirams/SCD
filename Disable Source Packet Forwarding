@@ -49,3 +49,13 @@ Thanks & Regards,
 
 Not Applicable. Control is already implemented and compliant. IPv4 source routed packet forwarding is disabled. IPv4 forwarding and IPv6 forwarding are disabled. The property is not available for IPv6 in the current Solaris version; however, IPv6 forwarding and routing are disabled, satisfying the security objective.
 No customization required. Existing configuration meets the control requirement.
+
+
+
+
+
+ipadm show-prop -p _forward_src_routed -co current ipv4
+ipadm show-prop -p _forward_src_routed -co persistent ipv4
+
+ipadm show-prop -p _forward_src_routed -co current ipv6
+ipadm show-prop -p _forward_src_routed -co persistent ipv6
