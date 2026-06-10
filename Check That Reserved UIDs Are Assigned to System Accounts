@@ -86,5 +86,50 @@ Note: The IT-AO should ensure that all necessary pre-requisites such as onboardi
 
 
 
+
+SCD Customization Request for Approval - Annexure B
+
+Brief of Application/Tool/Device:
+CMP FASTPLUS application is hosted on Solaris 11.4 operating system. The server is hardened as per CIS Oracle Solaris 11.4 Secure Configuration Document (SCD) requirements and compliance validation is being performed.
+
+Application Version Details:
+CMP FASTPLUS – Production Version (As Applicable)
+
+SCD Title and Details:
+Control 9.17 – Check That Reserved UIDs Are Assigned to System Accounts
+
+Challenges in implementing controls / Reason for Customization:
+During SCD assessment, the control identified the following accounts with reserved UIDs:
+- sshd
+- _polkitd
+- ikeuser
+- _ntp
+
+Verification was performed using the recommended audit script, id command, and /etc/shadow entries. The identified accounts were confirmed to be Oracle Solaris 11.4 operating system service accounts and not application-created or custom user accounts.
+
+Further validation confirmed:
+- sshd, ikeuser, and _ntp are locked system accounts (LK/NP) and are not available for interactive login.
+- _polkitd is a PolicyKit service account required for Solaris operating system functionality.
+- No unauthorized, local, application, or custom user accounts were found using reserved UIDs.
+
+The objective of this control is to prevent assignment of reserved UIDs to non-system users. Since the reported accounts are legitimate Solaris operating system service accounts utilizing reserved UIDs by design, modification of UID values is not recommended and may impact operating system services and vendor supportability.
+
+Changes proposed under Customization:
+No technical change is proposed.
+Request approval to justify and accept the presence of Solaris OS-managed service accounts (sshd, _polkitd, ikeuser, and _ntp) with reserved UIDs as compliant exceptions.
+
+Whether customization for the control approved in any older versions of SCD:
+Not Applicable / No previous approval available.
+
+Compensatory Controls:
+1. All identified accounts are operating system-managed service accounts.
+2. Interactive login is disabled for the identified service accounts.
+3. Accounts are monitored through standard Solaris security controls and periodic access reviews.
+4. No custom or application accounts are permitted to use reserved UID ranges.
+5. Compliance verification is performed periodically as part of server hardening and security review activities.
+
+
+
+
  
 
