@@ -59,3 +59,84 @@ ipadm show-prop -p _forward_src_routed -co persistent ipv4
 
 ipadm show-prop -p _forward_src_routed -co current ipv6
 ipadm show-prop -p _forward_src_routed -co persistent ipv6
+
+
+
+
+
+
+
+Requesting Department: IT-CMP
+
+Name of Application/Tool/Device:
+CMP FASTPLUS
+
+Brief of Application/Tool/Device:
+CMP FASTPLUS is a business-critical application hosted on Solaris 11.4 operating system. The server is hardened in accordance with CIS Oracle Solaris 11.4 Secure Configuration Document (SCD) requirements.
+
+Application Version Details:
+CMP FASTPLUS – Production Version (As Applicable)
+
+Operating System Name & Version:
+Solaris 11.4
+
+SCD Version No.:
+CIS_Oracle_Solaris_11.4
+
+SCD Type:
+OS
+
+SCD Title and Details:
+Disable Source Packet Forwarding
+
+Type of Customization (Application Specific / Global):
+Application Specific
+
+Control/Controls for which Customization is required:
+Disable Source Packet Forwarding
+
+Risk Categorization of Controls:
+Medium
+
+Challenges in Implementing Controls / Reason for Customization (Please provide Business Requirements and Technical Reasons with evidence):
+Verification was performed using the CIS-recommended audit commands.
+
+IPv4 verification confirmed that the "_forward_src_routed" property is configured as "0" for both current and persistent settings:
+
+- ipadm show-prop -p _forward_src_routed -co current ipv4 = 0
+- ipadm show-prop -p _forward_src_routed -co persistent ipv4 = 0
+
+Further verification for IPv6 showed that the "_forward_src_routed" property is not available on the current Solaris 11.4 operating system build. Execution of the audit command returned "Unknown property", and the property is not listed among supported IPv6 properties.
+
+Therefore:
+
+- IPv4 configuration is compliant with CIS requirements.
+- IPv6 parameter is not supported by the operating system and cannot be configured.
+- No security exposure related to source-routed packet forwarding has been identified.
+
+Changes Proposed under Customization:
+No configuration change is required.
+
+The control objective is already satisfied for IPv4. For IPv6, the parameter is not available in the current Solaris 11.4 implementation; therefore, no remediation action is applicable.
+
+Whether Customization for the Control was Approved in Older Versions of SCD:
+Not Applicable.
+
+Compensatory Controls, if any:
+
+1. Source-routed packet forwarding is disabled for IPv4.
+2. Standard Solaris hardening controls are implemented.
+3. Network access is controlled through enterprise security controls and firewall policies.
+4. Periodic compliance reviews are performed.
+5. IPv6 does not expose the "_forward_src_routed" property in the current Solaris 11.4 build.
+
+IP of the UAT Server:
+<Provide UAT Server IP>
+
+Risk Analysis from IS&SP including Residual Risk, if any:
+Residual risk is negligible. IPv4 is compliant with CIS requirements and the corresponding IPv6 property is not supported by the operating system. No additional risk has been identified.
+
+SPOC Details:
+BUDHIRAM SAHANI
+Deputy Manager (Systems)
+
