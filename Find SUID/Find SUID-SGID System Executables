@@ -1,0 +1,362 @@
+find / \( -fstype nfs -o -fstype cachefs -o -fstype autofs -o -fstype ctfs -o -fstype mntfs -o -fstype objfs -o -fstype proc \) -prune -o -type f \( -perm -4000 -o -perm -2000 \) -print
+
+elfsign verify -e /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2
+elfsign verify -e /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb
+elfsign verify -e /u03/app/19.0.0/grid/bin/oradism
+elfsign verify -e /u03/app/19.0.0/grid/bin/extjob
+elfsign verify -e /u03/app/19.0.0/grid/bin/jssu
+elfsign verify -e /u03/app/19.0.0/grid/bin/oracle
+elfsign verify -e /usr/xpg6/bin/crontab
+elfsign verify -e /usr/sbin/fmdump
+elfsign verify -e /usr/sbin/smbadm
+elfsign verify -e /usr/sbin/quota
+elfsign verify -e /usr/sbin/ping
+elfsign verify -e /usr/sbin/list_devices
+elfsign verify -e /usr/sbin/allocate
+elfsign verify -e /usr/sbin/traceroute
+elfsign verify -e /usr/sbin/deallocate
+elfsign verify -e /usr/bin/atq
+elfsign verify -e /usr/bin/rcp
+elfsign verify -e /usr/bin/Xorg
+elfsign verify -e /usr/bin/newtask
+elfsign verify -e /usr/bin/Xvnc
+elfsign verify -e /usr/bin/crontab
+elfsign verify -e /usr/bin/rlogin
+elfsign verify -e /usr/bin/newgrp
+elfsign verify -e /usr/bin/atrm
+elfsign verify -e /usr/bin/Xephyr
+elfsign verify -e /usr/bin/sudo
+elfsign verify -e /usr/bin/rsh
+elfsign verify -e /usr/bin/pkexec
+elfsign verify -e /usr/bin/pfedit
+elfsign verify -e /usr/bin/xlock
+elfsign verify -e /usr/bin/at
+elfsign verify -e /usr/bin/cdrw
+elfsign verify -e /usr/bin/su
+elfsign verify -e /usr/bin/passwd
+elfsign verify -e /usr/bin/sys-suspend
+elfsign verify -e /usr/bin/rmformat
+elfsign verify -e /usr/bin/lock
+elfsign verify -e /usr/xpg4/bin/at
+elfsign verify -e /usr/xpg4/bin/crontab
+elfsign verify -e /usr/lib/inet/mailq
+elfsign verify -e /usr/lib/polkit-1/polkit-agent-helper-1
+elfsign verify -e /usr/lib/acct/accton
+elfsign verify -e /usr/lib/fs/ufs/ufsrestore
+elfsign verify -e /usr/lib/fs/ufs/ufsdump
+elfsign verify -e /usr/lib/fs/smbfs/umount
+elfsign verify -e /usr/lib/fs/smbfs/mount
+elfsign verify -e /usr/lib/utmp_update
+elfsign verify -e /usr/lib/ssh/ssh-keysign
+elfsign verify -e /u04/app/oracle/product/19.3.0/db_1/bin/jssu
+elfsign verify -e /u04/app/oracle/product/19.3.0/db_1/bin/oracle
+elfsign verify -e /u04/app/oracle/product/19.3.0/db_1/bin/oradism
+
+
++++++++++++++++++++++++++++++++++ ALL PASSED AND FAIL ++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+root@cmphdb14:/tmp# elfsign verify -e /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2
+elfsign verify -e /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr
+elfsign verify -e /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb
+elfsign verify -e /u03/app/19.0.0/grid/bin/oradism
+elfsign verify -e /u03/app/19.0.0/grid/bin/extjob
+elfsign verify -e /u03/app/19.0.0/grid/bin/jssu
+elfsign verify -e /u03/app/19.0.0/grid/bin/oracle
+elfsign verify -e /usr/xpg6/bin/crontab
+elfsign verify -e /usr/sbin/fmdump
+elfsign verify -e /usr/sbin/smbadm
+elfsign verify -e /usr/sbin/quota
+elfsign verify -e /usr/sbin/ping
+elfsign verify -e /usr/sbin/list_devices
+elfsign verify -e /usr/sbin/allocate
+elfsign verify -e /usr/sbin/traceroute
+elfsign verify -e /usr/sbin/deallocate
+elfsign verify -e /usr/bin/atq
+elfsign verify -e /usr/bin/rcp
+elfsign verify -e /usr/bin/Xorg
+elfsign verify -e /usr/bin/newtask
+elfsign verify -e /usr/bin/Xvnc
+elfsign verify -e /usr/bin/crontab
+elfsign verify -e /usr/bin/rlogin
+elfsign verify -e /usr/bin/newgrp
+elfsign verify -e /usr/bin/atrm
+elfsign verify -e /usr/bin/Xephyr
+elfsign verify -e /usr/bin/sudo
+elfsign verify -e /usr/bin/rsh
+elfsign verify -e /usr/bin/pkexec
+elfsign verify -e /usr/bin/pfedit
+elfsign verify -e /usr/bin/xlock
+elfsign verify -e /usr/bin/at
+elfsign verify -e /usr/bin/cdrw
+elfsign verify -e /usr/bin/su
+elfsign verify -e /usr/bin/passwd
+elfsign verify -e /usr/bin/sys-suspend
+elfsign verify -e /usr/bin/rmformat
+elfsign verify -e /usr/bin/lock
+elfsign verify -e /usr/xpg4/bin/at
+elfsign verify -e /usr/xpg4/bin/crontab
+elfsign verify -e /usr/lib/inet/mailq
+elfsign verify -e /usr/lib/polkit-1/polkit-agent-helper-1
+elfsign verify -e /usr/lib/acct/accton
+elfsign verify -e /usr/lib/fs/ufs/ufsrestore
+elfsign verify -e /usr/lib/fs/ufs/ufsdump
+elfsign verify -e /usr/lib/fs/smbfs/umount
+elfsign verify -e /usr/lib/fs/smbfs/mount
+elfsign verify -e /usr/lib/utmp_update
+elfsign verify -e /usr/lib/ssh/ssh-keysign
+elfsign verify -e /u04/app/oracle/product/19.3.0/db_1/bin/jssu
+elfsign verify -e /u04/app/oracle/product/19.3.0/db_1/bin/oracle
+elfsign verify -e /u04/app/oracle/product/19.3.0/db_1/bin/oradism
+
+
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/oradism.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/extjob.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/jssu.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/oracle.
+elfsign: verification of /usr/xpg6/bin/crontab passed.
+elfsign: verification of /usr/sbin/fmdump passed.
+elfsign: verification of /usr/sbin/smbadm passed.
+elfsign: verification of /usr/sbin/quota passed.
+elfsign: verification of /usr/sbin/ping passed.
+elfsign: verification of /usr/sbin/list_devices passed.
+elfsign: verification of /usr/sbin/allocate passed.
+elfsign: verification of /usr/sbin/traceroute passed.
+elfsign: verification of /usr/sbin/deallocate passed.
+elfsign: verification of /usr/bin/atq passed.
+elfsign: verification of /usr/bin/rcp passed.
+elfsign: verification of /usr/bin/Xorg passed.
+elfsign: verification of /usr/bin/newtask passed.
+elfsign: verification of /usr/bin/Xvnc passed.
+elfsign: verification of /usr/bin/crontab passed.
+elfsign: verification of /usr/bin/rlogin passed.
+elfsign: verification of /usr/bin/newgrp passed.
+elfsign: verification of /usr/bin/atrm passed.
+elfsign: verification of /usr/bin/Xephyr passed.
+elfsign: verification of /usr/bin/sudo passed.
+elfsign: verification of /usr/bin/rsh passed.
+elfsign: verification of /usr/bin/pkexec passed.
+elfsign: verification of /usr/bin/pfedit passed.
+elfsign: verification of /usr/bin/xlock passed.
+elfsign: verification of /usr/bin/at passed.
+elfsign: verification of /usr/bin/cdrw passed.
+elfsign: verification of /usr/bin/su passed.
+elfsign: verification of /usr/bin/passwd passed.
+elfsign: verification of /usr/bin/sys-suspend passed.
+elfsign: verification of /usr/bin/rmformat passed.
+elfsign: verification of /usr/bin/lock passed.
+elfsign: verification of /usr/xpg4/bin/at passed.
+elfsign: verification of /usr/xpg4/bin/crontab passed.
+elfsign: verification of /usr/lib/inet/mailq passed.
+elfsign: verification of /usr/lib/polkit-1/polkit-agent-helper-1 passed.
+elfsign: verification of /usr/lib/acct/accton passed.
+elfsign: verification of /usr/lib/fs/ufs/ufsrestore passed.
+elfsign: verification of /usr/lib/fs/ufs/ufsdump passed.
+elfsign: verification of /usr/lib/fs/smbfs/umount passed.
+elfsign: verification of /usr/lib/fs/smbfs/mount passed.
+elfsign: verification of /usr/lib/utmp_update passed.
+elfsign: verification of /usr/lib/ssh/ssh-keysign passed.
+elfsign: no signature found in /u04/app/oracle/product/19.3.0/db_1/bin/jssu.
+elfsign: no signature found in /u04/app/oracle/product/19.3.0/db_1/bin/oracle.
+elfsign: no signature found in /u04/app/oracle/product/19.3.0/db_1/bin/oradism.
+
+
+
+
++++++++++++++++++++++++++++++++++ ALL  FAIL ++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr.
+elfsign: no signature found in /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/oradism.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/extjob.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/jssu.
+elfsign: no signature found in /u03/app/19.0.0/grid/bin/oracle.
+elfsign: no signature found in /u04/app/oracle/product/19.3.0/db_1/bin/jssu.
+elfsign: no signature found in /u04/app/oracle/product/19.3.0/db_1/bin/oracle.
+elfsign: no signature found in /u04/app/oracle/product/19.3.0/db_1/bin/oradism.
+
+
+pkgchk -l
+ 
+ 
+pkgchk -l /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2
+pkgchk -l /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb
+pkgchk -l /u03/app/19.0.0/grid/bin/oradism
+pkgchk -l /u03/app/19.0.0/grid/bin/extjob
+pkgchk -l /u03/app/19.0.0/grid/bin/jssu
+pkgchk -l /u03/app/19.0.0/grid/bin/oracle
+pkgchk -l /u04/app/oracle/product/19.3.0/db_1/bin/jssu
+pkgchk -l /u04/app/oracle/product/19.3.0/db_1/bin/oracle
+pkgchk -l /u04/app/oracle/product/19.3.0/db_1/bin/oradism
+
+
+
+
+pkgchk -l /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2
+pkgchk -l /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr
+pkgchk -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb
+pkgchk -l /u03/app/19.0.0/grid/bin/oradism
+pkgchk -l /u03/app/19.0.0/grid/bin/extjob
+pkgchk -l /u03/app/19.0.0/grid/bin/jssu
+pkgchk -l /u03/app/19.0.0/grid/bin/oracle
+pkgchk -l /u04/app/oracle/product/19.3.0/db_1/bin/jssu
+pkgchk -l /u04/app/oracle/product/19.3.0/db_1/bin/oracle
+pkgchk -l /u04/app/oracle/product/19.3.0/db_1/bin/oradism
+
+WARNING: no pathnames were associated with </OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2>
+WARNING: no pathnames were associated with </OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo>
+WARNING: no pathnames were associated with </OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2>
+WARNING: no pathnames were associated with </OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs>
+WARNING: no pathnames were associated with </OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr>
+WARNING: no pathnames were associated with </OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb>
+WARNING: no pathnames were associated with </u03/app/19.0.0/grid/bin/oradism>
+WARNING: no pathnames were associated with </u03/app/19.0.0/grid/bin/extjob>
+WARNING: no pathnames were associated with </u03/app/19.0.0/grid/bin/jssu>
+WARNING: no pathnames were associated with </u03/app/19.0.0/grid/bin/oracle>
+WARNING: no pathnames were associated with </u04/app/oracle/product/19.3.0/db_1/bin/jssu>
+WARNING: no pathnames were associated with </u04/app/oracle/product/19.3.0/db_1/bin/oracle>
+WARNING: no pathnames were associated with </u04/app/oracle/product/19.3.0/db_1/bin/oradism>
+
+
+
+
+ls -l /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2
+ls -l /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo
+ls -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2
+ls -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs
+ls -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr
+ls -l /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb
+ls -l /u03/app/19.0.0/grid/bin/oradism
+ls -l /u03/app/19.0.0/grid/bin/extjob
+ls -l /u03/app/19.0.0/grid/bin/jssu
+ls -l /u03/app/19.0.0/grid/bin/oracle
+ls -l /u04/app/oracle/product/19.3.0/db_1/bin/jssu
+ls -l /u04/app/oracle/product/19.3.0/db_1/bin/oracle
+ls -l /u04/app/oracle/product/19.3.0/db_1/bin/oradism
+
+-rws--s--x   1 orasuper oinstall   43192 Dec  1  2024 /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2
+-rwsr-x---   1 root     oinstall 8982784 Dec 12  2022 /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo
+-rws--s--x   1 orasuper oinstall   35080 Mar 22  2021 /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2
+-rwsr-x---   1 root     oinstall   95024 Dec 12  2022 /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs
+-rwsr-x---   1 root     oinstall   86312 Dec 12  2022 /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr
+-rwsr-x---   1 root     oinstall   24720 Dec 12  2022 /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb
+-rwsr-x---   1 root     oinstall   83720 Jan 19  2025 /u03/app/19.0.0/grid/bin/oradism
+-rwsr-x---   1 root     oinstall 4428392 Mar 13 15:43 /u03/app/19.0.0/grid/bin/extjob
+-rwsr-x---   1 root     oinstall 4191328 Jan 19  2025 /u03/app/19.0.0/grid/bin/jssu
+-rwsr-s--x   1 grid     oinstall 575834672 Mar 13 15:43 /u03/app/19.0.0/grid/bin/oracle
+-rwsr-x---   1 root     oinstall 4186944 Apr 26  2022 /u04/app/oracle/product/19.3.0/db_1/bin/jssu
+-rwsr-s--x   1 orasuper asmadmin 576702824 Mar 13 16:29 /u04/app/oracle/product/19.3.0/db_1/bin/oracle
+-rwsr-x---   1 root     oinstall   83720 Apr 26  2022 /u04/app/oracle/product/19.3.0/db_1/bin/oradism
+
+
+
+
+As part of the SCD compliance review, we have identified the following Oracle-related executables with SUID/SGID permissions enabled on the server:
+Oracle
+
+-rws--s--x   1 orasuper oinstall   43192 Dec  1  2024 /OEM_Agent/Agent13c/agent_24.1.0.0.0/bin/emtgtctl2
+-rwsr-x---   1 root     oinstall 8982784 Dec 12  2022 /OEM_Agent/Agent13c/agent_24.1.0.0.0/sbin/nmo
+-rws--s--x   1 orasuper oinstall   35080 Mar 22  2021 /OEM_Agent/Agent13c/agent_13.5.0.0.0/bin/emtgtctl2
+-rwsr-x---   1 root     oinstall   95024 Dec 12  2022 /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmhs
+-rwsr-x---   1 root     oinstall   86312 Dec 12  2022 /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmr
+-rwsr-x---   1 root     oinstall   24720 Dec 12  2022 /OEM_Agent/Agent13c/agent_13.5.0.0.0/sbin/nmb
+-rwsr-x---   1 root     oinstall   83720 Jan 19  2025 /u03/app/19.0.0/grid/bin/oradism
+-rwsr-x---   1 root     oinstall 4428392 Mar 13 15:43 /u03/app/19.0.0/grid/bin/extjob
+-rwsr-x---   1 root     oinstall 4191328 Jan 19  2025 /u03/app/19.0.0/grid/bin/jssu
+-rwsr-s--x   1 grid     oinstall 575834672 Mar 13 15:43 /u03/app/19.0.0/grid/bin/oracle
+-rwsr-x---   1 root     oinstall 4186944 Apr 26  2022 /u04/app/oracle/product/19.3.0/db_1/bin/jssu
+-rwsr-s--x   1 orasuper asmadmin 576702824 Mar 13 16:29 /u04/app/oracle/product/19.3.0/db_1/bin/oracle
+-rwsr-x---   1 root     oinstall   83720 Apr 26  2022 /u04/app/oracle/product/19.3.0/db_1/bin/oradism
+
+
+We would like to confirm whether these SUID/SGID permissions are required for Oracle Database, Grid Infrastructure, and OEM Agent functionality.
+
+Kindly help us with the following:
+Are these binaries Oracle/OEM vendor-required executables?
+
+Are the existing SUID/SGID permissions mandatory for normal operations?
+
+Will removal of the SUID/SGID permissions have any impact on Oracle Database, Grid Infrastructure, OEM Agent, or related services?
+
+Can these binaries be considered justified as exceptions for SCD compliance purposes?
+
+Your confirmation will help us proceed with the compliance closure activity.
+
+
+
+Below files Oracle-related executables with SUID/SGID permissions  are required which is not recommended to change. Please get the required exception  for the same. 
+
+
+
+based on the above fill the below form 
+
+SCD Customization request for Approval
+Annexure B
+Request for SCD Customization:
+Requesting Department:	IT-CMP
+Name of Application/Tool/Device	CMP FASTPLUS
+Brief of Application/Tool/Device	
+Application Version Details	CMP FASTPLUS 
+Operating System Name & Version	Solaris 11.4
+
+SCD version No.	Scd 14
+SCD Type (OS/ DB/ Application Server/ Web Server/ Network Device/ Security Device/ Middleware/ Other Appliances or Devices)	OS
+SCD Title and Details	
+Type of Customization (Application Specific / Global)	
+Control/Controls for which Customization is required, (list may be attached as Annexure)	NA
+Risk categorization of controls, if any	Medium
+Challenges in implementing controls/ Reason for Customization (Please provide Business Requirements and Technical Reasons with evidence)	
+Changes proposed under Customization	
+Whether customization for the control/Controls approved in any older versions of SCD. (Details or Approval may be attached)	NA
+Compensatory Controls, if any
+	
+IP of the UAT Server	.
+
+
+Risk Analysis from IS&SP including Residual Risk if any – SCD Team	
+SPOC Details	BUDHIRAM SAHANI
+We confirm that, UAT setup is ready for Testing the customized SCD in Our Department.                                                                                                
+
+                                                               Name: BUDHIRAM SAHANI
+                                                            Designation: DEPUTY MANAGER (SYSTEMS)
+
+Enclosures: 
+1.	Copy of SCD 
+2.	List of controls under customization
+3.	Any approved customization for controls in any previous versions
+4.	Technical Documentation/ Hardening Guidelines/ Security best Practices from OEM
+Note: The IT-AO should ensure that all necessary pre-requisites such as onboarding of devices in ITSAM, PAM, SCGuard, Group Policy updates (in case of Windows devices), Firewall Access Requests and user with necessary privileges are in place.
+
+
+
+
