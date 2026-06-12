@@ -360,3 +360,111 @@ Note: The IT-AO should ensure that all necessary pre-requisites such as onboardi
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+Requesting Department:
+IT-CMP
+
+Name of Application/Tool/Device:
+CMP FASTPLUS
+
+Brief of Application/Tool/Device:
+CMP FASTPLUS is a critical business application hosted on Oracle Database 19c and Oracle Grid Infrastructure environment. The application utilizes Oracle Enterprise Manager (OEM) Agent for monitoring and management activities.
+
+Application Version Details:
+CMP FASTPLUS
+
+Operating System Name & Version:
+Solaris 11.4
+
+SCD Version No.:
+SCD 14
+
+SCD Type:
+OS
+
+SCD Title and Details:
+Review and Restriction of SUID/SGID Executables
+
+Type of Customization:
+Application Specific
+
+Control/Controls for which Customization is required:
+Control related to identification, review and removal of SUID/SGID permissions from executables wherever not required.
+
+Risk Categorization of Controls:
+Medium
+
+Challenges in Implementing Controls / Reason for Customization (Business Requirement & Technical Justification):
+
+As part of SCD compliance assessment, a review of SUID/SGID executables was performed using standard Solaris audit procedures. During the assessment, a number of Oracle Database, Oracle Grid Infrastructure and Oracle Enterprise Manager (OEM) Agent binaries were identified with SUID/SGID permissions.
+
+Further validation was carried out using the following methods:
+
+• Discovery of SUID/SGID binaries through system audit commands.
+• Verification of system binaries using elfsign utility.
+• Package ownership validation using pkgchk utility.
+• Detailed file permission review using ls -l command.
+
+The review established that the identified files belong to Oracle Database 19c, Oracle Grid Infrastructure and Oracle Enterprise Manager Agent installations. These binaries are Oracle vendor-supplied executables and are not part of the native Solaris operating system packages.
+
+The findings were shared with the Oracle application support team for assessment. Oracle team confirmed that the identified binaries are vendor-required executables and the associated SUID/SGID permissions are necessary for normal functioning of Oracle Database, Grid Infrastructure, ASM and OEM Agent services.
+
+Removal or modification of these permissions may result in:
+
+• Failure of Oracle Database services.
+• Failure of Oracle Grid Infrastructure and ASM operations.
+• Failure of OEM Agent monitoring functions.
+• Issues during database startup, maintenance and administration activities.
+• Disruption of application availability and monitoring services.
+
+Since the permissions are required by Oracle software design and operational requirements, implementation of the SCD recommendation to remove SUID/SGID permissions is not technically feasible without impacting business-critical services.
+
+Accordingly, approval is requested to retain SUID/SGID permissions on the identified Oracle binaries and treat them as application-specific exceptions under SCD compliance requirements.
+
+Changes Proposed under Customization:
+
+Retain SUID/SGID permissions on the identified Oracle Database, Oracle Grid Infrastructure and Oracle Enterprise Manager Agent binaries.
+
+Exclude only the approved Oracle vendor-required executables from SCD remediation activities relating to SUID/SGID removal.
+
+No changes are proposed for any other operating system binaries or application files.
+
+Whether customization for the control/controls approved in any older versions of SCD:
+NA
+
+Compensatory Controls:
+
+• Access to Oracle software directories is restricted to authorized administrators only.
+• Privileged access is controlled through approved administrative accounts.
+• All changes are governed through Change Management procedures.
+• Periodic compliance and security reviews are conducted.
+• File ownership and permissions are monitored regularly.
+• Server access is restricted and monitored through enterprise security controls.
+• Oracle binaries are maintained under OEM/vendor recommended configurations.
+
+Risk Analysis from IS&SP including Residual Risk:
+
+Residual risk is considered low and acceptable as the identified SUID/SGID permissions are vendor-mandated and essential for Oracle product functionality. The risk is mitigated through restricted administrative access, change management controls, periodic compliance reviews and monitoring mechanisms. Removal of the permissions would introduce operational risk significantly higher than the residual security risk associated with retaining them.
+
+SPOC Details:
+BUDHIRAM SAHANI
+
+We confirm that UAT setup is ready for testing the customized SCD in our department.
+
+Name: BUDHIRAM SAHANI
+Designation: Deputy Manager (Systems)
+
+
+
