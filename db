@@ -1,0 +1,3 @@
+Currently, we are prioritizing the migration of the Oracle Database 19c environment from Solaris to RHEL Linux. Once the migration is successfully completed, we plan to proceed with the Oracle Database upgrade to 26ai.
+
+For testing and POC activities related to the Oracle Database 26ai upgrade, we require a POC server. At present, the CMP department does not have an available Solaris server for this purpose.
