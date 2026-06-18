@@ -96,3 +96,19 @@ Risk Analysis from IS&SP including Residual Risk if any – SCD Team
 SPOC Details	BUDHIRAM SAHANI
 
 and generate doc
+
+
+
+
+
+
+
+ar OS Team,
+As per the audit observation, a compensatory control is required for RPCBind (TCP/UDP Port 111).
+Kindly implement a host-based firewall (Solaris IP Filter) to restrict inbound access to Port 111 only from the authorized and verified NFS server IP addresses. All other inbound access to this port should be blocked.
+Additionally, please share the following evidence after implementation:
+Firewall configuration/rules showing the restriction on Port 111.
+Output of IP Filter rules (ipfstat -io).
+RPCBind service status (svcs rpc/bind).
+Confirmation of the authorized NFS server IP addresses allowed through the firewall.
+Please share the implementation details and supporting evidence for audit closure.
