@@ -131,5 +131,27 @@ Compensatory Controls:
 
 
 
+
+Dear Team,
+
+The reported accounts (sshd, _polkitd, ikeuser, and _ntp) were reviewed and verified using the id command and /etc/shadow entries.
+
+These accounts are operating system service accounts created and managed by Solaris and are not custom or application user accounts. The identified UIDs are reserved by design for OS functionality and are required for the respective services to operate correctly.
+
+Verification performed confirms the following:
+
+sshd – SSH service account.
+
+_polkitd – PolicyKit service account required by the operating system.
+
+ikeuser – System account used by Solaris services.
+
+_ntp – NTP service account.
+
+Additionally, the accounts are non-interactive and locked, as verified from the /etc/shadow entries. No unauthorized or user-created accounts with reserved UIDs were identified on the server.
+
+Since the objective of Control 9.17 is to ensure that reserved UIDs are not assigned to unauthorized or custom user accounts, and all identified accounts are legitimate Solaris system accounts utilizing reserved UIDs by design, the observation appears to be a false positive.
+
+Request you to review the attached evidence and consider the observation as compliant / not applicable
  
 
