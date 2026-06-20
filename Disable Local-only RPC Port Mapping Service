@@ -151,3 +151,14 @@ root@cmphdb14:~# nfsstat -m
  Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,acl,rsize=1048576,wsize=1048576,retrans=5,timeo=600
  Attr cache:    acregmin=3,acregmax=60,acdirmin=30,acdirmax=60
 
+
+
+
+We reviewed the recommended compensatory control for RPCBind (TCP/UDP Port 111).
+During verification, Solaris IP Filter service/package was not found to be configured on the server. The server is actively utilizing NFS services through the following authorized NFS servers:
+10.176.4.204
+10.176.58.189
+10.177.109.97
+10.176.145.5
+We are evaluating the feasibility of implementing the recommended host-based firewall control. In case Solaris IP Filter is not supported/available in the current environment, request your confirmation whether equivalent network-level firewall restrictions limiting Port 111 access exclusively to the above NFS server IP addresses can be considered as an acceptable compensatory control
+
