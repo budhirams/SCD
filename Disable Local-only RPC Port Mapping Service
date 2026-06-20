@@ -119,3 +119,35 @@ Please share the implementation details and supporting evidence for audit closur
 Comments: Comments: Kindly implement below compensatory control and share evidence
 
 Implement strict host-based firewalls (e.g., Solaris IP Filter) to restrict inbound access to svc:/network/rpc/bind (TCP/UDP port 111) strictly to the verified IP addresses of the authorized NFS servers.
+
+
+
+
+
+root@cmphdb14:~# mount | grep nfs
+/Cloud_800_nfs on 10.176.4.204:/CMP_800_NFS remote/read/write/setuid/devices/rstchown/bg/hard/rsize=65536/wsize=65536/vers=4/forcedirectio/nointr/proto=tcp/xattr/dev=ffbc0001 on Fri May 22 16:15:27 2026
+root@cmphdb14:~# nfsstat -m
+/Cloud_800_nfs from 10.176.4.204:/CMP_800_NFS
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,nointr,link,symlink,forcedirectio,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Attr cache:    acregmin=3,acregmax=60,acdirmin=30,acdirmax=60
+
+/data from 10.176.58.189:/FastPlus_Cloud_DR/data
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Attr cache:    acregmin=3,acregmax=60,acdirmin=30,acdirmax=60
+
+/doc-root from 10.176.58.189:/FastPlus_Cloud_DR/doc-root
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Attr cache:    acregmin=3,acregmax=60,acdirmin=30,acdirmax=60
+
+/systemlogs from 10.176.58.189:/FastPlus_Cloud_DR/systemlogs
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Attr cache:    acregmin=3,acregmax=60,acdirmin=30,acdirmax=60
+
+/DR_CLOUD_FASTPLUS_NFS_MIGRATION from 10.177.109.97:/DR_CMP_FASTPLUS_NFS_Temp
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Attr cache:    acregmin=3,acregmax=60,acdirmin=30,acdirmax=60
+
+/DB_Audit_trail_logs from 10.176.145.5:/DB_Audit_trail_logs/
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,acl,rsize=1048576,wsize=1048576,retrans=5,timeo=600
+ Attr cache:    acregmin=3,acregmax=60,acdirmin=30,acdirmax=60
+
