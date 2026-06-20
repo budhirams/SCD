@@ -64,3 +64,37 @@ Kindly review and consider the observation for closure.
 
 root@cmphdb14:~# uname -a
 SunOS cmphdb14 5.11 11.4.92.214.1 sun4v sparc sun4v non-virtualized
+
+
+
+
+
+root@cmphdb14:~# ipadm show-prop -p _forward_src_routed -co current ipv6
+ipadm: warning: cannot get property '_forward_src_routed' for 'ipv6': Unknown property
+?
+root@cmphdb14:~# ipadm show-prop -p _forward_src_routed -co current ipv4
+0
+root@cmphdb14:~#
+root@cmphdb14:~# ipadm show-if
+IFNAME     CLASS    STATE    ACTIVE OVER
+lo0        loopback ok       yes    --
+bkh125     ip       ok       yes    --
+prod0      ip       ok       yes    --
+net1       ip       ok       yes    --
+net4       ip       ok       yes    --
+sp-host0   ip       ok       yes    --
+net2       ip       disabled no     --
+net3       ip       disabled no     --
+root@cmphdb14:~# netstat -rn -f int6
+int6: unknown address family.
+root@cmphdb14:~# netstat -rn -f inet6
+
+Routing Table: IPv6
+  Destination/Mask            Gateway                   Flags Ref   Use    If
+--------------------------- --------------------------- ----- --- ------- -----
+::1                         ::1                         UH     19 17984738 lo0
+root@cmphdb14:~# svcs -a | grep ipfilter
+root@cmphdb14:~# svcs ipfilter
+svcs: Pattern 'ipfilter' doesn't match any instances
+STATE          STIME               FMRI
+
