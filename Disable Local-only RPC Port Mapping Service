@@ -112,3 +112,10 @@ Output of IP Filter rules (ipfstat -io).
 RPCBind service status (svcs rpc/bind).
 Confirmation of the authorized NFS server IP addresses allowed through the firewall.
 Please share the implementation details and supporting evidence for audit closure.
+
+
+
+
+Comments: Comments: Kindly implement below compensatory control and share evidence
+
+Implement strict host-based firewalls (e.g., Solaris IP Filter) to restrict inbound access to svc:/network/rpc/bind (TCP/UDP port 111) strictly to the verified IP addresses of the authorized NFS servers.
