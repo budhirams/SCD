@@ -98,3 +98,21 @@ root@cmphdb14:~# svcs ipfilter
 svcs: Pattern 'ipfilter' doesn't match any instances
 STATE          STIME               FMRI
 
+
+
+
+
+
+
+
+
+
+Dear Team,
+As verified on the Solaris 11.4 SRU 92 server:
+IPv4 _forward_src_routed property is set to 0, indicating source-routed packet forwarding is disabled.
+For IPv6, the _forward_src_routed property is not available in the current Solaris 11.4 SRU 92 build and returns "Unknown property".
+IPv6 is not actively configured for network communication. Verification through IPv6 routing table confirms only loopback (::1) entries are present and no IPv6 gateway/routes are configured.
+Since IPv6 is not used for business communication on this server, the risk associated with IPv6 source-routed packets is not applicable.
+Additionally, network-level controls are in place through perimeter firewalls to restrict unauthorized traffic before reaching the Solaris host.
+Kindly review and consider the observation for closure/customization.
+
