@@ -162,3 +162,11 @@ During verification, Solaris IP Filter service/package was not found to be confi
 10.176.145.5
 We are evaluating the feasibility of implementing the recommended host-based firewall control. In case Solaris IP Filter is not supported/available in the current environment, request your confirmation whether equivalent network-level firewall restrictions limiting Port 111 access exclusively to the above NFS server IP addresses can be considered as an acceptable compensatory control
 
+
+
+
+Comments: In legacy NFS environments (NFSv2 and NFSv3), the client relies on the RPC port mapper (rpcbind on port 111) to dynamically discover which ports the mountd, nlockmgr (Network Lock Manager), and status services are using.
+
+NFSv4 was specifically redesigned to be firewall-friendly. It consolidates all operations—including mounting, file locking, and data transfer—into a single TCP connection on port 2049. Therefore, an environment exclusively using NFSv4 mounts does not inherently require rpcbind to be running to maintain storage operations so this customization is not required
+
+Kindly test in UAT infra .
