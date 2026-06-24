@@ -467,3 +467,40 @@ root@cmphdb14:~# mount | grep nfs
 /Cloud_800_nfs on 10.176.4.204:/CMP_800_NFS remote/read/write/setuid/devices/rstchown/bg/hard/rsize=65536/wsize=65536/vers=4/forcedirectio/nointr/proto=tcp/xattr/dev=ffbc0001 on Fri May 22 16:15:27 2026
 root@cmphdb14:~#
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+root@cmphdb14:~# svcs -a  | grep krb
+disabled       2026-05-22T16:04:09 svc:/network/security/krb5_prop:default
+disabled       2026-05-22T16:04:09 svc:/network/security/krb5kdc:default
+root@cmphdb14:~# nfsstat -m | grep sys
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,nointr,link,symlink,forcedirectio,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+/systemlogs from 10.176.58.189:/FastPlus_Cloud_DR/systemlogs
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,rsize=65536,wsize=65536,retrans=5,timeo=600
+ Flags:         vers=4,mvers=1,proto=tcp,sec=sys,hard,intr,link,symlink,acl,rsize=1048576,wsize=1048576,retrans=5,timeo=600
+
