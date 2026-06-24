@@ -36,3 +36,11 @@ Ensure ICMP redirects are strictly disabled (net.ipv4.conf.all.send_redirects = 
 Enforce SELinux in enforcing mode to strictly confine container processes and prevent unauthorized host access.
 Utilize rootless Podman containers wherever technically feasible to limit the blast radius of a potential container escape.
 Ensure the CMP NEXTGEN server is isolated in a properly segmented network zone (e.g., a restricted container DMZ) with upstream firewall monitoring, rather than residing in a flat core network.
+
+
+
+
+
+As per the validation performed by the OS team, the /sftp_home filesystem is currently mounted using NFSv3 and is dependent on the rpcbind service for mount and locking operations. The validation also confirmed that mounting the share using NFSv4 was unsuccessful.
+Since the current implementation relies on NFSv3, disabling the rpcbind service may impact NFS connectivity and application functionality.
+Regarding the suggestion to use SFTP instead of NFS, SFTP is a file transfer mechanism whereas NFS provides shared filesystem access. Migration from NFS to SFTP would require application-level and operational changes and cannot be implemented as an OS-level configuration change.
