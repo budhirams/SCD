@@ -187,3 +187,283 @@ Protocol Enforcement: Explicitly disable legacy NFSv2 and NFSv3 via the Service 
 Strong Authentication (Kerberos): Deprecate sys (AUTH_SYS), which is highly vulnerable to UID/GID spoofing. Enforce Kerberos authentication. Use sec=krb5 for secure authentication, sec=krb5i for data integrity, or sec=krb5p for full data-in-transit encryption.
 Strict Export Controls: Restrict NFS shares strictly to authorized client IP addresses or subnets using ZFS share properties (e.g., zfs set share.nfs.sec.default.rw=<IP> <pool/dataset>). Never export to * or broad subnets.
 Privilege Restriction: Ensure root squashing is enforced (map root access to an unprivileged anonymous UID) to prevent clients from exercising administrative privileges on the mounted share.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+root@cmphdb14:~# nfsstat -s
+
+Server rpc:
+Connection oriented:
+calls      badcalls   nullrecv   badlen     xdrcall    dupchecks  dupreqs
+0          0          0          0          0          0          0
+Connectionless:
+calls      badcalls   nullrecv   badlen     xdrcall    dupchecks  dupreqs
+2          2          0          0          2          0          0
+
+Server NFSv2:
+calls       badcalls    referrals   referlinks
+0           0           0           0
+
+Server NFSv3:
+calls       badcalls    referrals   referlinks
+0           0           0           0
+
+Server NFSv4:
+calls       badcalls    referrals   referlinks
+0           0           0           0
+Version 2: (0 calls)
+null     getattr  setattr  root     lookup   readlink read     wrcache
+0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%
+write    create   remove   rename   link     symlink  mkdir    rmdir
+0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%
+readdir  statfs
+0 0%     0 0%
+Version 3: (0 calls)
+null        getattr     setattr     lookup      access      readlink
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+read        write       create      mkdir       symlink     mknod
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+remove      rmdir       rename      link        readdir     readdirplus
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+fsstat      fsinfo      pathconf    commit
+0 0%        0 0%        0 0%        0 0%
+Version 4.0: (0 calls)
+null                 compound
+0 0%                 0 0%
+Version 4.0: (0 operations)
+reserved             access               close
+0 0%                 0 0%                 0 0%
+commit               create               delegpurge
+0 0%                 0 0%                 0 0%
+delegreturn          getattr              getfh
+0 0%                 0 0%                 0 0%
+link                 lock                 lockt
+0 0%                 0 0%                 0 0%
+locku                lookup               lookupp
+0 0%                 0 0%                 0 0%
+nverify              open                 openattr
+0 0%                 0 0%                 0 0%
+open_confirm         open_downgrade       putfh
+0 0%                 0 0%                 0 0%
+putpubfh             putrootfh            read
+0 0%                 0 0%                 0 0%
+readdir              readlink             remove
+0 0%                 0 0%                 0 0%
+rename               renew                restorefh
+0 0%                 0 0%                 0 0%
+savefh               secinfo              setattr
+0 0%                 0 0%                 0 0%
+setclientid          setclientid_confirm  verify
+0 0%                 0 0%                 0 0%
+write                release_lockowner    illegal
+0 0%                 0 0%                 0 0%
+Version 4.1: (0 calls)
+null                 compound
+0 0%                 0 0%
+Version 4.1: (0 operations)
+reserved             access               close
+0 0%                 0 0%                 0 0%
+commit               create               delegpurge
+0 0%                 0 0%                 0 0%
+delegreturn          getattr              getfh
+0 0%                 0 0%                 0 0%
+link                 lock                 lockt
+0 0%                 0 0%                 0 0%
+locku                lookup               lookupp
+0 0%                 0 0%                 0 0%
+nverify              open                 openattr
+0 0%                 0 0%                 0 0%
+open_confirm         open_downgrade       putfh
+0 0%                 0 0%                 0 0%
+putpubfh             putrootfh            read
+0 0%                 0 0%                 0 0%
+readdir              readlink             remove
+0 0%                 0 0%                 0 0%
+rename               renew                restorefh
+0 0%                 0 0%                 0 0%
+savefh               secinfo              setattr
+0 0%                 0 0%                 0 0%
+setclientid          setclientid_confirm  verify
+0 0%                 0 0%                 0 0%
+write                release_lockowner    backchannel_ctl
+0 0%                 0 0%                 0 0%
+bind_conn_to_session exchange_id          create_session
+0 0%                 0 0%                 0 0%
+destroy_session      free_stateid         get_dir_delegation
+0 0%                 0 0%                 0 0%
+getdeviceinfo        getdevicelist        layoutcommit
+0 0%                 0 0%                 0 0%
+layoutget            layoutreturn         secinfo_no_name
+0 0%                 0 0%                 0 0%
+sequence             set_ssv              test_stateid
+0 0%                 0 0%                 0 0%
+want_delegation      destroy_clientid     reclaim_complete
+0 0%                 0 0%                 0 0%
+illegal
+0 0%
+
+Server nfs_acl:
+Version 2: (0 calls)
+null        getacl      setacl      getattr     access      getxattrdir
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+Version 3: (0 calls)
+null        getacl      setacl      getxattrdir
+0 0%        0 0%        0 0%        0 0%
+root@cmphdb14:~#
+root@cmphdb14:~# nfsstat -s
+
+Server rpc:
+Connection oriented:
+calls      badcalls   nullrecv   badlen     xdrcall    dupchecks  dupreqs
+0          0          0          0          0          0          0
+Connectionless:
+calls      badcalls   nullrecv   badlen     xdrcall    dupchecks  dupreqs
+2          2          0          0          2          0          0
+
+Server NFSv2:
+calls       badcalls    referrals   referlinks
+0           0           0           0
+
+Server NFSv3:
+calls       badcalls    referrals   referlinks
+0           0           0           0
+
+Server NFSv4:
+calls       badcalls    referrals   referlinks
+0           0           0           0
+Version 2: (0 calls)
+null     getattr  setattr  root     lookup   readlink read     wrcache
+0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%
+write    create   remove   rename   link     symlink  mkdir    rmdir
+0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%     0 0%
+readdir  statfs
+0 0%     0 0%
+Version 3: (0 calls)
+null        getattr     setattr     lookup      access      readlink
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+read        write       create      mkdir       symlink     mknod
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+remove      rmdir       rename      link        readdir     readdirplus
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+fsstat      fsinfo      pathconf    commit
+0 0%        0 0%        0 0%        0 0%
+Version 4.0: (0 calls)
+null                 compound
+0 0%                 0 0%
+Version 4.0: (0 operations)
+reserved             access               close
+0 0%                 0 0%                 0 0%
+commit               create               delegpurge
+0 0%                 0 0%                 0 0%
+delegreturn          getattr              getfh
+0 0%                 0 0%                 0 0%
+link                 lock                 lockt
+0 0%                 0 0%                 0 0%
+locku                lookup               lookupp
+0 0%                 0 0%                 0 0%
+nverify              open                 openattr
+0 0%                 0 0%                 0 0%
+open_confirm         open_downgrade       putfh
+0 0%                 0 0%                 0 0%
+putpubfh             putrootfh            read
+0 0%                 0 0%                 0 0%
+readdir              readlink             remove
+0 0%                 0 0%                 0 0%
+rename               renew                restorefh
+0 0%                 0 0%                 0 0%
+savefh               secinfo              setattr
+0 0%                 0 0%                 0 0%
+setclientid          setclientid_confirm  verify
+0 0%                 0 0%                 0 0%
+write                release_lockowner    illegal
+0 0%                 0 0%                 0 0%
+Version 4.1: (0 calls)
+null                 compound
+0 0%                 0 0%
+Version 4.1: (0 operations)
+reserved             access               close
+0 0%                 0 0%                 0 0%
+commit               create               delegpurge
+0 0%                 0 0%                 0 0%
+delegreturn          getattr              getfh
+0 0%                 0 0%                 0 0%
+link                 lock                 lockt
+0 0%                 0 0%                 0 0%
+locku                lookup               lookupp
+0 0%                 0 0%                 0 0%
+nverify              open                 openattr
+0 0%                 0 0%                 0 0%
+open_confirm         open_downgrade       putfh
+0 0%                 0 0%                 0 0%
+putpubfh             putrootfh            read
+0 0%                 0 0%                 0 0%
+readdir              readlink             remove
+0 0%                 0 0%                 0 0%
+rename               renew                restorefh
+0 0%                 0 0%                 0 0%
+savefh               secinfo              setattr
+0 0%                 0 0%                 0 0%
+setclientid          setclientid_confirm  verify
+0 0%                 0 0%                 0 0%
+write                release_lockowner    backchannel_ctl
+0 0%                 0 0%                 0 0%
+bind_conn_to_session exchange_id          create_session
+0 0%                 0 0%                 0 0%
+destroy_session      free_stateid         get_dir_delegation
+0 0%                 0 0%                 0 0%
+getdeviceinfo        getdevicelist        layoutcommit
+0 0%                 0 0%                 0 0%
+layoutget            layoutreturn         secinfo_no_name
+0 0%                 0 0%                 0 0%
+sequence             set_ssv              test_stateid
+0 0%                 0 0%                 0 0%
+want_delegation      destroy_clientid     reclaim_complete
+0 0%                 0 0%                 0 0%
+illegal
+0 0%
+
+Server nfs_acl:
+Version 2: (0 calls)
+null        getacl      setacl      getattr     access      getxattrdir
+0 0%        0 0%        0 0%        0 0%        0 0%        0 0%
+Version 3: (0 calls)
+null        getacl      setacl      getxattrdir
+0 0%        0 0%        0 0%        0 0%
+root@cmphdb14:~# zfs get sharenfs -r
+cannot open '-r': filesystem does not exist
+root@cmphdb14:~# mount | grep nfs
+/Cloud_800_nfs on 10.176.4.204:/CMP_800_NFS remote/read/write/setuid/devices/rstchown/bg/hard/rsize=65536/wsize=65536/vers=4/forcedirectio/nointr/proto=tcp/xattr/dev=ffbc0001 on Fri May 22 16:15:27 2026
+root@cmphdb14:~#
+
