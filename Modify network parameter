@@ -44,3 +44,114 @@ Ensure the CMP NEXTGEN server is isolated in a properly segmented network zone (
 As per the validation performed by the OS team, the /sftp_home filesystem is currently mounted using NFSv3 and is dependent on the rpcbind service for mount and locking operations. The validation also confirmed that mounting the share using NFSv4 was unsuccessful.
 Since the current implementation relies on NFSv3, disabling the rpcbind service may impact NFS connectivity and application functionality.
 Regarding the suggestion to use SFTP instead of NFS, SFTP is a file transfer mechanism whereas NFS provides shared filesystem access. Migration from NFS to SFTP would require application-level and operational changes and cannot be implemented as an OS-level configuration change.
+
+
+
+
+
+
+
+
+
+
+[root@registryprod ~]# firewall-cmd --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: ens192
+  sources:
+  services: cockpit dhcpv6-client ssh
+  ports: 27041/tcp 8443/tcp 4750/tcp 5000/tcp 4118/tcp 14118/tcp 8400/tcp 8401/tcp 8403/tcp 52521/tcp
+  protocols:
+  forward: no
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+[root@registryprod ~]# iptables -L -n
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+LIBVIRT_INP  all  --  0.0.0.0/0            0.0.0.0/0
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+LIBVIRT_FWX  all  --  0.0.0.0/0            0.0.0.0/0
+LIBVIRT_FWI  all  --  0.0.0.0/0            0.0.0.0/0
+LIBVIRT_FWO  all  --  0.0.0.0/0            0.0.0.0/0
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+LIBVIRT_OUT  all  --  0.0.0.0/0            0.0.0.0/0
+
+Chain LIBVIRT_INP (1 references)
+target     prot opt source               destination
+ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0            udp dpt:53
+ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0            udp dpt:67
+ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:67
+
+Chain LIBVIRT_OUT (1 references)
+target     prot opt source               destination
+ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0            udp dpt:53
+ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0            udp dpt:68
+ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:68
+
+Chain LIBVIRT_FWO (1 references)
+target     prot opt source               destination
+ACCEPT     all  --  192.168.122.0/24     0.0.0.0/0
+REJECT     all  --  0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+
+Chain LIBVIRT_FWI (1 references)
+target     prot opt source               destination
+ACCEPT     all  --  0.0.0.0/0            192.168.122.0/24     ctstate RELATED,ESTABLISHED
+REJECT     all  --  0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+
+Chain LIBVIRT_FWX (1 references)
+target     prot opt source               destination
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0
+[root@registryprod ~]# sysctl
+
+Usage:
+ sysctl [options] [variable[=value] ...]
+
+Options:
+  -a, --all            display all variables
+  -A                   alias of -a
+  -X                   alias of -a
+      --deprecated     include deprecated parameters to listing
+  -b, --binary         print value without new line
+  -e, --ignore         ignore unknown variables errors
+  -N, --names          print variable names without values
+  -n, --values         print only values of the given variable(s)
+  -p, --load[=<file>]  read values from file
+  -f                   alias of -p
+      --system         read values from all system directories
+  -r, --pattern <expression>
+                       select setting that match expression
+  -q, --quiet          do not echo variable set
+  -w, --write          enable writing a value to variable
+  -o                   does nothing
+  -x                   does nothing
+  -d                   alias of -h
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see sysctl(8).
+[root@registryprod ~]# getenforce
+Disabled
+[root@registryprod ~]# podman ps
+CONTAINER ID  IMAGE                                         COMMAND               CREATED      STATUS      PORTS                   NAMES
+bee685771b22  registry.access.redhat.com/ubi8/pause:8.10-5  infinity              3 weeks ago  Up 3 weeks  0.0.0.0:8443->8443/tcp  296089ead74e-infra
+e7d2e16732ca  registry.redhat.io/rhel8/redis-6:1-190        run-redis             3 weeks ago  Up 3 weeks  0.0.0.0:8443->8443/tcp  quay-redis
+5ae24ade70b5  registry.redhat.io/quay/quay-rhel8:v3.12.12   registry-nomigrat...  3 weeks ago  Up 3 weeks  0.0.0.0:8443->8443/tcp  quay-app
+[root@registryprod ~]# sysctl net.ipv4.all.send_redirects
+sysctl: cannot stat /proc/sys/net/ipv4/all/send_redirects: No such file or directory
+[root@registryprod ~]# sysctl net.ipv4.conf.all.send_redirects
+net.ipv4.conf.all.send_redirects = 0
+[root@registryprod ~]# sysctl net.ipv6.conf.all.send_redirects
+sysctl: cannot stat /proc/sys/net/ipv6/conf/all/send_redirects: No such file or directory
+[root@registryprod ~]# sysctl net.ipv4.conf.all.accept_redirects
+net.ipv4.conf.all.accept_redirects = 0
