@@ -155,3 +155,21 @@ net.ipv4.conf.all.send_redirects = 0
 sysctl: cannot stat /proc/sys/net/ipv6/conf/all/send_redirects: No such file or directory
 [root@registryprod ~]# sysctl net.ipv4.conf.all.accept_redirects
 net.ipv4.conf.all.accept_redirects = 0
+
+
+
+
+
+
+
+As requested, the compensatory controls have been reviewed and the corresponding evidence has been collected for the Podman registry server.
+Please note that the server is hosting a Podman-based registry application which uses bridge networking for container communication. Due to this application dependency, net.ipv4.ip_forward cannot be disabled (net.ipv4.ip_forward = 1), as doing so would impact container networking and application functionality.
+The following compensatory controls are in place:
+Host-based firewall is enabled and configured to allow only the required application ports.
+Firewalld forwarding and masquerading are disabled.
+ICMP redirects are disabled:
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.all.accept_redirects = 0
+Podman containers are operational and the registry service is functioning normally.
+Relevant command outputs and screenshots are attached as evidence for review.
+Kindly review the submitted evidence and confirm if the implemented compensatory controls are sufficient for compliance
