@@ -17,3 +17,22 @@ grep -R "net.ipv4.ip_forward" /etc/sysctl.conf /etc/sysctl.d/ /usr/lib/sysctl.d/
 /etc/sysctl.d/99-sysctl.conf:net.ipv4.ip_forward = 0
 
 systemctl status libvirtd  ----inactive
+
+
+
+
+
+
+
+
+
+
+Comments: Kindly share evidence for compensatory controls as mentioned below.
+
+Compensatory Control to minimize risk:
+Implement strict host-based firewall rules (firewalld or nftables) to restrict IP forwarding only to the specific interfaces and subnets required by Podman (e.g., the container bridge interface, such as cni-podman0). Deny all other arbitrary routing.
+Apply strict ingress/egress filtering at the host level to ensure only necessary operational ports (e.g., TCP 443/5000 for the registry) are exposed.
+Ensure ICMP redirects are strictly disabled (net.ipv4.conf.all.send_redirects = 0 and net.ipv4.conf.all.accept_redirects = 0) to prevent routing table manipulation by attackers.
+Enforce SELinux in enforcing mode to strictly confine container processes and prevent unauthorized host access.
+Utilize rootless Podman containers wherever technically feasible to limit the blast radius of a potential container escape.
+Ensure the CMP NEXTGEN server is isolated in a properly segmented network zone (e.g., a restricted container DMZ) with upstream firewall monitoring, rather than residing in a flat core network.
