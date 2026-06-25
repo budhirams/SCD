@@ -523,3 +523,23 @@ Kindly confirm the recommended Oracle-supported approach for achieving complianc
 The objective is to determine whether Port 111 can be disabled safely without impacting NFS functionality in the current Solaris 11.4 environment.
 Kindly provide your recommendations and any relevant Oracle documentation/reference for the same.
 
+
+
+
+
+
+
+
+
+Subject: Clarification Required on NFSv4-Only Configuration and RPCBind (Port 111) Dependency
+Hi Oracle Team,
+As part of a security remediation activity, we have received a recommendation to eliminate the dependency on RPCBind (Port 111) by enforcing an NFSv4-only configuration and disabling legacy NFS protocols.
+We request your guidance on the following:
+In Solaris 11.4, can NFS be configured to operate exclusively on NFSv4?
+If NFSv4-only is enforced, can the dependency on RPCBind (Port 111) be completely removed?
+Are there any Solaris 11.4 limitations, prerequisites, or known impacts associated with disabling NFSv2/NFSv3 and using only NFSv4?
+Is there any scenario where RPCBind (Port 111) would still be required even when NFSv4 is being used?
+Kindly confirm the recommended Oracle-supported approach for achieving compliance with the security recommendation.
+The objective is to determine whether Port 111 can be disabled safely without impacting NFS functionality in the current Solaris 11.4 environment.
+Kindly provide your recommendations and any relevant Oracle documentation/reference for the same.
+
