@@ -173,3 +173,16 @@ net.ipv4.conf.all.accept_redirects = 0
 Podman containers are operational and the registry service is functioning normally.
 Relevant command outputs and screenshots are attached as evidence for review.
 Kindly review the submitted evidence and confirm if the implemented compensatory controls are sufficient for compliance
+
+
+
+
+
+2.27.1	Modify Network Parameters	All required host-only parameters configured	"net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+net.ipv4.ip_forward = 1
+net.ipv4.tcp_syncookies = 1"	Ensure system not acting as a router; enable protections	Disable forwarding, send_redirects; enable rp_filter and            tcp_syncookies.	Forwarding or redirects may allow unintended routing; lack of protections            increases risk.	Set via sysctl -w or conf files: ip_forward=0; send_redirects=0; rp_filter=1; tcp_syncookies=1; icmp_ignore_bogus_error_responses=1.
+
