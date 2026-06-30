@@ -40,3 +40,58 @@ disabled       2026-06-30T15:57:33 svc:/network/rpc/bind:default
 
 root@cmpmdb140:~# mount -F nfs -o rw,bg,hard,rsize=65536,wsize=65536,vers=4.1,forcedirectio,nointr,proto=tcp,suid 10.189.216.183:/CMP_FASTPLUS_NFS /cloud_nfs
 
+
+
+
+
+
+
+
+
+
+
+10.189.216.211:/CMP_FASTPLUS_NFS01
+                        15T  11.2T      3.79T    75%    /cloud_nfs01
+10.189.27.136:/DB_Audit_trail_logs/
+                       576G   301G       275G    53%    /DB_Audit_trail_logs
+10.191.22.190:/FastPlus_Cloud_DC/doc-root
+                        15T  4.29T      10.7T    29%    /doc-root
+10.191.22.190:/FastPlus_Cloud_DC/data
+                        15T  4.29T      10.7T    29%    /data
+10.191.22.190:/FastPlus_Cloud_DC/systemlogs
+                        15T  4.29T      10.7T    29%    /systemlogs
+10.177.109.97:/DR_CMP_FASTPLUS_NFS_Temp
+                        35T  24.5T      10.5T    71%    /DR_CLOUD_FASTPLUS_NFS_MIGRATION
+10.189.216.183:/CMP_FASTPLUS_NFS
+                      54.5T  27.2T      27.3T    50%    /cloud_nfs
+
+root@cmpmdb140:~# svcs -a | grep -i rpc
+disabled       2026-06-18T16:50:26 svc:/network/rpc/gss:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/rstat:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/rusers:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/smserver:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/spray:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/wall:default
+online         2026-06-29T16:27:06 svc:/network/rpc/bind:default
+root@cmpmdb140:~#
+
+
+
+root@cmpmdb140:~# svcadm disable svc:/network/rpc/bind:default
+root@cmpmdb140:~#
+root@cmpmdb140:~# svcs -a | grep -i rpc
+disabled       2026-06-18T16:50:26 svc:/network/rpc/gss:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/rstat:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/rusers:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/smserver:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/spray:default
+disabled       2026-06-18T16:51:13 svc:/network/rpc/wall:default
+disabled       2026-06-30T15:57:33 svc:/network/rpc/bind:default
+
+
+root@cmpmdb140:~# mount -F nfs -o rw,bg,hard,rsize=65536,wsize=65536,vers=4.1,forcedirectio,nointr,proto=tcp,suid 10.189.216.183:/CMP_FASTPLUS_NFS /cloud_nfs
+
+ svcadm disable svc:/network/rpc/bind:default
+
+
+
