@@ -4,3 +4,112 @@ Issue: Private IP connectivity failure (Unable to ping)
 ITSAM Tickets: 1718207 || 1720544
 The server is unable to communicate over the private IP. Kindly investigate the issue from the network/infrastructure side and verify if there are any connectivity, routing, firewall, or security restrictions affecting the communication.
 Request you to check and provide your findings or implement the necessary resolution at the earliest.
+
+
+
+
+
+[root@dr_cmp_ocp_bastion_server ~]# oc get pods
+NAME                                 READY   STATUS             RESTARTS            AGE
+admission-control-5664d8fb86-fzcr9   1/1     Running            0                   20d
+admission-control-5664d8fb86-hj79f   1/1     Running            0                   20d
+admission-control-5664d8fb86-k9pbz   1/1     Running            0                   20d
+central-7fd7db6648-j56fq             1/1     Running            0                   109m
+central-db-7688cb98b7-2n2kd          1/1     Running            0                   20d
+collector-4xvsm                      2/3     CrashLoopBackOff   459 (2m10s ago)     25h
+collector-5vqkw                      1/3     CrashLoopBackOff   79328 (20s ago)     488d
+collector-7lfm8                      2/3     CrashLoopBackOff   73972 (4m35s ago)   489d
+collector-9hln9                      2/3     CrashLoopBackOff   73712 (48s ago)     488d
+collector-cd76n                      1/3     CrashLoopBackOff   73724 (30s ago)     488d
+collector-g2wsx                      2/3     CrashLoopBackOff   458 (4m26s ago)     25h
+collector-g7ll9                      2/3     CrashLoopBackOff   66713 (4m31s ago)   547d
+collector-g98zg                      1/3     CrashLoopBackOff   73707 (3m2s ago)    488d
+collector-hj47d                      1/3     CrashLoopBackOff   95438 (58s ago)     488d
+collector-jgqnn                      2/3     CrashLoopBackOff   83245 (2m28s ago)   448d
+collector-lw627                      1/3     CrashLoopBackOff   67606 (2m18s ago)   547d
+collector-m4rrf                      2/3     CrashLoopBackOff   73720 (3m4s ago)    488d
+collector-p4tfn                      1/3     CrashLoopBackOff   38 (4m3s ago)       108m
+collector-r4sxk                      1/3     CrashLoopBackOff   73722 (3m34s ago)   356d
+collector-s6m95                      1/3     CrashLoopBackOff   73687 (2m20s ago)   488d
+collector-t6k94                      1/3     CrashLoopBackOff   66943 (69s ago)     547d
+scanner-56c45b8cbf-nxk26             1/1     Running            0                   20d
+scanner-56c45b8cbf-pdrf8             1/1     Running            1                   84d
+scanner-db-76c54ff449-dxpmf          1/1     Running            0                   20d
+sensor-64698d4bfc-fmhln              1/1     Running            0                   20d
+[root@dr_cmp_ocp_bastion_server ~]# oc rsh collector-cd76n
+Defaulted container "collector" out of: collector, compliance, node-inventory
+error: unable to upgrade connection: container not found ("collector")
+[root@dr_cmp_ocp_bastion_server ~]# clear
+[root@dr_cmp_ocp_bastion_server ~]# oc get pods
+NAME                                 READY   STATUS             RESTARTS            AGE
+admission-control-5664d8fb86-fzcr9   1/1     Running            0                   20d
+admission-control-5664d8fb86-hj79f   1/1     Running            0                   20d
+admission-control-5664d8fb86-k9pbz   1/1     Running            0                   20d
+central-7fd7db6648-j56fq             1/1     Running            0                   110m
+central-db-7688cb98b7-2n2kd          1/1     Running            0                   20d
+collector-4xvsm                      2/3     CrashLoopBackOff   459 (3m3s ago)      25h
+collector-5vqkw                      1/3     CrashLoopBackOff   79328 (73s ago)     488d
+collector-7lfm8                      3/3     Running            73973 (5m28s ago)   489d
+collector-9hln9                      2/3     CrashLoopBackOff   73712 (101s ago)    488d
+collector-cd76n                      1/3     CrashLoopBackOff   73724 (83s ago)     488d
+collector-g2wsx                      2/3     Error              459 (5m19s ago)     25h
+collector-g7ll9                      3/3     Running            66714 (5m24s ago)   547d
+collector-g98zg                      2/3     CrashLoopBackOff   73708 (3m55s ago)   488d
+collector-hj47d                      2/3     CrashLoopBackOff   95439 (111s ago)    488d
+collector-jgqnn                      2/3     CrashLoopBackOff   83245 (3m21s ago)   448d
+collector-lw627                      1/3     CrashLoopBackOff   67606 (3m11s ago)   547d
+collector-m4rrf                      2/3     CrashLoopBackOff   73720 (3m57s ago)   488d
+collector-p4tfn                      2/3     CrashLoopBackOff   39 (4m56s ago)      109m
+collector-r4sxk                      1/3     CrashLoopBackOff   73722 (4m27s ago)   356d
+collector-s6m95                      1/3     CrashLoopBackOff   73687 (3m13s ago)   488d
+collector-t6k94                      1/3     CrashLoopBackOff   66943 (2m2s ago)    547d
+scanner-56c45b8cbf-nxk26             1/1     Running            0                   20d
+scanner-56c45b8cbf-pdrf8             1/1     Running            1                   84d
+scanner-db-76c54ff449-dxpmf          1/1     Running            0                   20d
+sensor-64698d4bfc-fmhln              1/1     Running            0                   20d
+[root@dr_cmp_ocp_bastion_server ~]# oc get secrets
+NAME                                                      TYPE                                  DATA   AGE
+admission-control-dockercfg-6jgvh                         kubernetes.io/dockercfg               1      601d
+admission-control-tls                                     Opaque                                3      601d
+admission-control-token-jv5tp                             kubernetes.io/service-account-token   4      601d
+builder-dockercfg-c4smg                                   kubernetes.io/dockercfg               1      601d
+builder-token-4td5w                                       kubernetes.io/service-account-token   4      601d
+central-db-dockercfg-9jmh7                                kubernetes.io/dockercfg               1      601d
+central-db-password                                       Opaque                                1      601d
+central-db-tls                                            Opaque                                3      601d
+central-db-token-2525s                                    kubernetes.io/service-account-token   4      601d
+central-dockercfg-g722n                                   kubernetes.io/dockercfg               1      601d
+central-htpasswd                                          Opaque                                2      601d
+central-monitoring-tls                                    kubernetes.io/tls                     2      601d
+central-tls                                               Opaque                                5      601d
+central-token-d8cgb                                       kubernetes.io/service-account-token   4      601d
+collector-dockercfg-9t8x5                                 kubernetes.io/dockercfg               1      601d
+collector-tls                                             Opaque                                3      601d
+collector-token-g9wp4                                     kubernetes.io/service-account-token   4      601d
+default-dockercfg-dszf6                                   kubernetes.io/dockercfg               1      601d
+default-token-6lwjk                                       kubernetes.io/service-account-token   4      601d
+deployer-dockercfg-cbxl7                                  kubernetes.io/dockercfg               1      601d
+deployer-token-876vx                                      kubernetes.io/service-account-token   4      601d
+helm-cluster-config                                       Opaque                                1      601d
+scanner-db-password                                       Opaque                                1      601d
+scanner-db-tls                                            Opaque                                3      601d
+scanner-dockercfg-trt82                                   kubernetes.io/dockercfg               1      601d
+scanner-tls                                               Opaque                                3      601d
+scanner-token-m8b65                                       kubernetes.io/service-account-token   4      601d
+sensor-dockercfg-crsmv                                    kubernetes.io/dockercfg               1      601d
+sensor-monitoring-tls                                     kubernetes.io/tls                     2      601d
+sensor-tls                                                Opaque                                3      601d
+sensor-token-vf862                                        kubernetes.io/service-account-token   4      601d
+service-ca                                                Opaque                                1      601d
+sh.helm.release.v1.stackrox-central-services.v1           helm.sh/release.v1                    1      601d
+sh.helm.release.v1.stackrox-secured-cluster-services.v1   helm.sh/release.v1                    1      601d
+sh.helm.release.v1.stackrox-secured-cluster-services.v2   helm.sh/release.v1                    1      599d
+sh.helm.release.v1.stackrox-secured-cluster-services.v3   helm.sh/release.v1                    1      547d
+sh.helm.release.v1.stackrox-secured-cluster-services.v4   helm.sh/release.v1                    1      547d
+[root@dr_cmp_ocp_bastion_server ~]# oc logs
+error: expected 'logs [-f] [-p] (POD | TYPE/NAME) [-c CONTAINER]'.
+POD or TYPE/NAME is a required argument for the logs command
+See 'oc logs -h' for help and examples
+[root@dr_cmp_ocp_bastion_server ~]# oc logs central-dockercfg-g722n
+error: error from server (NotFound): pods "central-dockercfg-g722n" not found in namespace "stackrox"
+[root@dr_cmp_ocp_bastion_server ~]#
