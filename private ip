@@ -1,0 +1,6 @@
+Dear Team,
+As requested by the CMP OS Team, we are escalating the below issue for your immediate attention.
+Issue: Private IP connectivity failure (Unable to ping)
+ITSAM Tickets: 1718207 || 1720544
+The server is unable to communicate over the private IP. Kindly investigate the issue from the network/infrastructure side and verify if there are any connectivity, routing, firewall, or security restrictions affecting the communication.
+Request you to check and provide your findings or implement the necessary resolution at the earliest.
