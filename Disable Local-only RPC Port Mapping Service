@@ -25,10 +25,11 @@ Please review and advise on this point.
 
 ------------------------------------ implementation ---------------------------------------------------------------
 netstat -nr | grep -i LISTEN | grep -i 111
-svcadm disable svc:/network/rpc/bind:default
 
-svcs -a | grep -i rpc
+
 root@cmpmdb140:~# svcs -a | grep -i rpc
+
+svcadm disable svc:/network/rpc/bind:default
 disabled       2026-06-18T16:50:26 svc:/network/rpc/gss:default
 disabled       2026-06-18T16:51:13 svc:/network/rpc/rstat:default
 disabled       2026-06-18T16:51:13 svc:/network/rpc/rusers:default
@@ -44,5 +45,4 @@ mount -F nfs -o rw,bg,hard,rsize=65536,wsize=65536,vers=4.1,forcedirectio,nointr
 mount -F nfs -o rw,bg,hard,rsize=65536,wsize=65536,vers=4.1,forcedirectio,nointr,proto=tcp,suid 10.191.22.190:/FastPlus_Cloud_DC/data /data
 mount -F nfs -o rw,bg,hard,rsize=65536,wsize=65536,vers=4.1,forcedirectio,nointr,proto=tcp,suid 10.191.22.190:/FastPlus_Cloud_DC/systemlogs /systemlogs
 mount -F nfs -o rw,bg,hard,rsize=65536,wsize=65536,vers=4.1,forcedirectio,nointr,proto=tcp,suid 10.177.109.97:/DR_CMP_FASTPLUS_NFS_Temp /DR_CLOUD_FASTPLUS_NFS_MIGRATION
-
 
