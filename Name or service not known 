@@ -1,0 +1,3 @@
+for p in $(oc get pods -n cmpicp -o name); do
+  oc logs -n cmpicp $p --all-containers=true --tail=100 2>/dev/null | grep -H "UnknownHostException\|Name or service not known" && echo "==== $p ===="
+done
