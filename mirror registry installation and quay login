@@ -1,0 +1,32 @@
+mirror-registry.tar.gz
+tar -xvzf mirror-registry.tar.gz
+mirror-registry
+./mirror-registry
+
+hostname -f
+mirror-registry.dmesser.io
+
+sudo ./mirror-registry install --quayHostname $(hostname -f)
+
+podman login -u init mirror-registry.dmesser.io:8443
+----- if getting error certificate signed by unknown authority
+podman login -u --tls-verify=false mirror-registry.dmesser.io:8443
+podman pod ps
+The mirror registry is deployed in the pod
+systemctl list-units | grep quay
+systemctl status quay-app
+  --- running
+
+At this time mirror-registry is ready to use
+I am not quite happy about the self-signed tls certificate
+-----------------------------------------------------------------------------------------
+
+sudo ./mirror-registry uninstall
+./mirror-registry help install
+
+./mirror-registry install --quayHostname $(hostname -f) --sslCert fullchain.pem --sslKey privKey.pem
+podman login -u init mirror-registry.dmesser.io:8443
+Password:
+Login Succceeded!
+
+so let;s login there as well with auto generated user credentials
