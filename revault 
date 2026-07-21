@@ -1,0 +1,5 @@
+Dear IS, SP, and PIMS Teams,
+During every monthly Revault activity, we are required to change the SSH configuration by setting PermitRootLogin to yes to complete the Revault process. However, as per the SCGuard compliance policy, PermitRootLogin must be set to no.
+This results in the same compliance issue recurring every month. After the Revault activity, PermitRootLogin is disabled again, but during the next Revault cycle it must once again be changed to yes.
+Kindly review this on a high-priority basis and provide a permanent resolution or an alternative approach that allows the Revault process to be completed without changing PermitRootLogin to yes every month.
+Your support in resolving this recurring issue is highly appreciated.
