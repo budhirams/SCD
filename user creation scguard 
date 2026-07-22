@@ -1,0 +1,8 @@
+Hi Team,
+As per the approved note, a dedicated SCGUARD user is required to be created on all applicable IT assets for credential-based SCD compliance scanning, similar to the SOCVA user.
+Kindly review the attached server inventory and:
+Verify that all applicable servers are included.
+If any server is missing, please add it to the list and update accordingly.
+Create the dedicated SCGUARD user on the applicable servers with the required root-equivalent/administrative privileges, as specified in the approved note, to enable SCD compliance scanning.
+Please share the updated status once the activity is completed.
+The approved note is attached for your reference.
