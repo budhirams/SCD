@@ -1,0 +1,11 @@
+Subject: Clarification Required for World-Writable File Permissions – Evidence Requested
+Dear Team,
+During the compliance review, we observed that the "Find World Writable Files" control is reporting multiple files as non-compliant. Even after correcting the permissions, the same files are being recreated with world-writable (777/others writable) permissions.
+This indicates that the permissions are likely being assigned by the application at the code level during file creation.
+Kindly review the application logic and provide clarification on the following:
+Why are these files being created with world-writable permissions?
+Is this permission setting a functional or business requirement?
+If yes, please share the technical justification and supporting evidence/approval for this implementation.
+If this is not required, kindly modify the application code to create files with secure permissions so that the compliance issue can be resolved permanently.
+The list of affected files is attached for your reference.
+Kindly provide your response at the earliest so that we can proceed with the compliance closure.
