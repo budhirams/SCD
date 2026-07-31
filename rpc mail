@@ -1,0 +1,5 @@
+Dear Team,
+As part of the SCD compliance implementation, we have disabled the Local-only RPC Port Mapping Service (svc:/network/rpc/bind) and migrated the environment to NFS 4.1, as recommended by the compliance guidelines.
+Kindly monitor the environment and let us know if you observe any database-related issues, application challenges, performance degradation, or slowness after these changes.
+As highlighted in the SCD recommendation, RPC-based services should be disabled unless they are explicitly required. If RPC is required for any application or service, please share the business justification so that an appropriate exception or alternative solution can be evaluated.
+Please provide your observations and feedback at the earliest.
