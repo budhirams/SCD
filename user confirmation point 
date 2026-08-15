@@ -1,0 +1,7 @@
+Dear Team,
+Please share the open points that require user confirmation.
+If user confirmation was also required for compliance closure, this point should have been included in SCGuard from the beginning. We need clarity on why compliance is being considered incomplete now due to user confirmation when this requirement was not mentioned earlier in SCGuard.
+Also, please clarify whether we need to share evidence for all servers or only a representative sample based on the RHEL/Solaris OS distribution.
+For example, if we have around 300 servers, manually collecting and sharing evidence for every server will be very time-consuming and operationally difficult. Therefore, please confirm the expected evidence methodology—whether evidence is required for all servers or whether a defined sample based on OS/distribution is acceptable.
+@SCGuard Team – Please confirm all the points mentioned by Rohit, including the user confirmation requirement and the evidence criteria.
+Request you to provide clear guidelines so that the same approach can be followed consistently for future compliance closures.
