@@ -1,0 +1,52 @@
+uadmin@cmpmtxn72:~$ sudo us -
+sudo: us: command not found
+uadmin@cmpmtxn72:~$ sudo su -
+Authorized users only. All activity may be monitored and reported.
+You have mail.
+root@cmpmtxn72:~# ls -lrth /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-17.log.Z
+ls -lrth /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-18.log.Z
+ls -lrth /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z
+ls -lrth /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-18.log.Z
+-rw-rw-rw-   1 qsb      other       263K Aug 17 23:54 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-17.log.Z
+-rw-rw-rw-   1 qsb      other       289K Aug 18 23:56 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-18.log.Z
+-rw-rw-rw-   1 qsb      other       907K Aug 17 23:56 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z
+-rw-rw-rw-   1 qsb      other       914K Aug 18 23:56 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-18.log.Z
+root@cmpmtxn72:~# su - qsb
+Authorized users only. All activity may be monitored and reported.
+mesg: cannot change mode
+mesg: cannot change mode
+Script started, file is /opt/sbi/qsb/cmpmtxn72/qsblogs.190826.185700.18:56
+qsb@cmpmtxn72:~$  ls -lrth /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-17.log.Z
+ls -lrth /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-18.log.Z
+ls -lrth /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z
+ls -lrth /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-18.log.Z
+-rw-rw-rw-   1 qsb      other       263K Aug 17 23:54 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-17.log.Z
+-rw-rw-rw-   1 qsb      other       289K Aug 18 23:56 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-18.log.Z
+-rw-rw-rw-   1 qsb      other       907K Aug 17 23:56 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z
+-rw-rw-rw-   1 qsb      other       914K Aug 18 23:56 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-18.log.Z
+qsb@cmpmtxn72:~$ chmod 644 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-17.log.Z
+chmod 644 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-18.log.Z
+chmod 644 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z
+chmod 644 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-18.log.Z
+qsb@cmpmtxn72:~$ chmod 644 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z^C
+qsb@cmpmtxn72:~$ ls -lrth /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-17.log.Z
+ls -lrth /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-18.log.Z
+ls -lrth /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z
+ls -lrth /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-18.log.Z
+-rw-r--r--   1 qsb      other       263K Aug 17 23:54 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-17.log.Z
+-rw-r--r--   1 qsb      other       289K Aug 18 23:56 /opt/batchlogs/qsb/smsmandates/smsmandates-2026-08-18.log.Z
+-rw-r--r--   1 qsb      other       907K Aug 17 23:56 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-17.log.Z
+-rw-r--r--   1 qsb      other       914K Aug 18 23:56 /opt/batchlogs/qsb/fileprocessor/fileprocessor-2026-08-18.log.Z
+qsb@cmpmtxn72:~$ umask
+0022
+qsb@cmpmtxn72:~$ grep '^qsb:' /etc/passwd
+qsb:x:1030:1:mandate project user:/opt/sbi/qsb:/bin/bash
+qsb@cmpmtxn72:~$ cd /home/orauser
+Display all 101 possibilities? (y or n)
+qsb@cmpmtxn72:~$ cd /home/orauser ^C
+qsb@cmpmtxn72:~$ pwd
+/opt/sbi/qsb
+qsb@cmpmtxn72:~$ cd
+qsb@cmpmtxn72:~$ pwd
+/opt/sbi/qsb
+qsb@cmpmtxn72:~$
