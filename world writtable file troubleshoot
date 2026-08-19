@@ -110,3 +110,71 @@ qsb@cmpmtxn72:~$ cd
 qsb@cmpmtxn72:~$ pwd
 /opt/sbi/qsb
 qsb@cmpmtxn72:~$
+
+
+
+
+
+
+
+
+
+Isliye humein Solaris process ka actual umask aur file creation/permission-change process trace karna hai.
+1. Pehle application ka PID identify karein
+ps -ef | grep -iE 'smsmandates|fileprocessor' | grep -v grep
+PID milne ke baad process ka umask check karein:
+pargs -a <PID>
+Solaris mein /proc/<PID>/status Linux jaisa same information nahi deta, isliye main Linux wala cat /proc/<PID>/status | grep Umask recommend nahi karunga.
+2. Sabse useful: truss
+Solaris 11.4 mein truss se process ki system calls trace karna bahut useful hai.
+File creation ko trace karne ke liye:
+truss -p <PID> -o /tmp/qsb_truss.out -t open,openat,creat,chmod,fchmod
+Phir jab application new log create kare, check:
+grep -E 'open|openat|creat|chmod|fchmod' /tmp/qsb_truss.out
+Aapko kuch aisa mil sakta hai:
+open("...log...", O_WRONLY|O_CREAT|O_TRUNC, 0666) = ...
+Agar application 0666 request kar rahi hai, ye normal hai—umask 0022 ke baad final file 0644 honi chahiye.
+Lekin agar trace mein baad mein:
+chmod("...log...", 0666) = 0
+milta hai, to root cause mil gaya: application/script file ko explicitly 666 kar rahi hai.
+3. logadm bhi check karein
+Solaris mein Linux के logrotate ke equivalent environment mein logadm commonly use hota hai.
+Check:
+grep -iE 'smsmandates|fileprocessor|batchlogs' /etc/logadm.conf
+Aur:
+cat /etc/logadm.conf
+Particularly permissions-related options/configuration dekhein.
+4. Application scripts mein chmod 666 search karein
+grep -RniE 'chmod|0666|666|umask' /opt/sbi/qsb 2>/dev/null
+Agar application kisi specific script se start hoti hai, us script ko specifically check karein.
+5. Ek controlled test zaroor karein
+qsb ke through:
+su - qsb
+umask
+touch /opt/batchlogs/qsb/test_umask.log
+ls -l /opt/batchlogs/qsb/test_umask.log
+Expected:
+-rw-r--r-- ... test_umask.log
+Agar ye 644 aata hai, to prove ho jayega:
+Solaris OS + qsb user ka umask correctly 0022 hai; issue application/log-generation mechanism mein hai.
+6. Aapke case mein main ye order follow karunga
+qsb umask
+    ↓
+0022 confirmed
+    ↓
+Manual touch test
+    ↓
+644 confirmed
+    ↓
+Identify smsmandates/fileprocessor PID
+    ↓
+truss application
+    ↓
+Check open()/creat() mode
+    ↓
+Check chmod()/fchmod()
+    ↓
+Check /etc/logadm.conf
+    ↓
+Check application scripts/config
+Sabse important next step: aap ps -ef | grep -iE 'smsmandates|fileprocessor' | grep -v grep ka output bhejiye. Uske basis par main aapko Solaris 11.4 mein exact truss command bata dunga, jisse hum prove kar sakenge ki 666 file creation ke time aa raha hai ya creation ke baad chmod se.
