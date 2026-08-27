@@ -144,3 +144,17 @@ CENTRALGOV 14707     1  0   Aug 05 ?        888:08 java -Xms2048m -Xmx3072m wac.
   waccmp 13547     1   0   Aug 24 ?         223:03 java -jar -Dspring.profiles.active=prod /opt/sbi/wac/integration/cmp_corp_onboarding_intg.jar
 CENTRALGOV 28691     1  0   Aug 21 ?        801:55 java -Xms6144m -Xmx8192m wac.framework.Workaholic start Itro_Payload_Gov
      qsb 13625  9230   0 09:31:29 pts/56      0:00 grep -i java
+
+
+
+
+
+  qsb@cmpmtxn72:~$ pcred 25299
+25299:  e/r/suid=1030  e/r/sgid=1
+qsb@cmpmtxn72:~$ ps -ef | grep "25299"
+     qsb 11901  9230   0 09:35:55 pts/56      0:00 grep 25299
+     qsb 25299     1   0   Aug 04 ?         370:43 java -Xms64m -Xmx3072m StartSpringBatchScheduler smsmandates
+qsb@cmpmtxn72:~$ ptree 25299
+25299 java -Xms64m -Xmx3072m StartSpringBatchScheduler smsmandates
+qsb@cmpmtxn72:~$ grep -Rni "umask" /opt/sbi/qsb /etc/init.d/ /etc/default 2>/dev/null
+qsb@cmpmtxn72:~$ grep -Rni "StartSpringBatchScheduler smsmandates" /opt/sbi/qsb /etc 2>/dev/null
