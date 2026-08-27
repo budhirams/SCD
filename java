@@ -1,4 +1,4 @@
-qsb@cmpmtxn72:~$ ps -ef | grep -i java
+uqsb@cmpmtxn72:~$ ps -ef | grep -i java
   wacgov 27612     1   0   Aug 04 ?         477:18 java -Xms64m -Xmx1024m wac.framework.Workaholic start BalanceFromCore_Gov
   waccmp   267     1   0 11:40:01 ?          81:29 java -jar -Dspring.profiles.active=prod /opt/sbi/wac/integration/cmp_corp_onboarding_intg.jar
   waccmp 29155     1   0   Aug 04 ?        2661:45 java -Xms6144m -Xmx8192m wac.framework.Workaholic start file_processor_huge
@@ -158,3 +158,30 @@ qsb@cmpmtxn72:~$ ptree 25299
 25299 java -Xms64m -Xmx3072m StartSpringBatchScheduler smsmandates
 qsb@cmpmtxn72:~$ grep -Rni "umask" /opt/sbi/qsb /etc/init.d/ /etc/default 2>/dev/null
 qsb@cmpmtxn72:~$ grep -Rni "StartSpringBatchScheduler smsmandates" /opt/sbi/qsb /etc 2>/dev/null
+
+
+
+
+
+
+Dear Team,
+During the investigation of the non-compliance related to world-writable files under /opt/batchlogs/qsb/smsmandates/, we observed that the log files are being created with 666 (-rw-rw-rw-) permissions.
+As part of the troubleshooting, the following checks were performed:
+The interactive qsb user session has the following umask: umask = 0022
+The process responsible for the smsmandates application was identified as: PID 25299 java -Xms64m -Xmx3072m StartSpringBatchScheduler smsmandates
+The process-level umask was checked using pfiles and the following was observed: Current umask: 000
+Since the application process is running with umask 000, a file created with the default mode 0666 can result in: 0666 - 000 = 0666
+The process has PPID 1, indicating that it was started independently of the current interactive shell.
+Startup/configuration searches were also performed for umask, smsmandates, and StartSpringBatchScheduler, but no corresponding configuration entry was identified.
+Based on the above evidence, the issue does not appear to be with the qsb user's interactive shell umask (0022). The smsmandates Java process itself is running with umask 000, which is resulting in the creation of world-writable files.
+Request you to please investigate the application/startup mechanism responsible for launching PID 25299 and confirm why the process is inheriting or setting umask 000.
+It is recommended to configure the application/startup mechanism to use an appropriate restrictive umask, preferably 0022 or as per the application's required permission model, so that newly generated log files are created with secure permissions (e.g. 0644) by default.
+Please also confirm whether the application code or logging framework is explicitly setting file permissions to 0666.
+For evidence, please find the recommended outputs to be captured and shared:
+umask
+pfiles 25299 | head -10
+ps -ef | grep 25299
+pargs -a 25299
+Relevant application/startup configuration showing how StartSpringBatchScheduler smsmandates is launched
+ls -l /opt/batchlogs/qsb/smsmandates/
+Request you to review and provide the root cause and permanent corrective action for closure of the compliance observation.
