@@ -185,3 +185,37 @@ pargs -a 25299
 Relevant application/startup configuration showing how StartSpringBatchScheduler smsmandates is launched
 ls -l /opt/batchlogs/qsb/smsmandates/
 Request you to review and provide the root cause and permanent corrective action for closure of the compliance observation.
+
+
+
+
+
+
+
+#!/bin/sh
+
+LOG="/var/log/world_writable_fix.log"
+
+echo "===== Started: $(date) =====" >> "$LOG"
+
+find /opt/batchlogs/qsb /opt/sbi/wac -type f -perm -0002 -print 2>/dev/null |
+while read FILE
+do
+    echo "$(date): Changing file $FILE from $(ls -ld "$FILE" | awk '{print $1}') to 644" >> "$LOG"
+    chmod 644 "$FILE"
+
+
+
+donefind /opt/batchlogs/qsb /opt/sbi/wac -type f -perm -0002 -ls 2>/dev/null
+
+find /opt/batchlogs/qsb /opt/sbi/wac -type d -perm -0002 -print 2>/dev/null |
+while read DIR
+do
+    echo "$(date): Changing directory $DIR from $(ls -ld "$DIR" | awk '{print $1}') to 755" >> "$LOG"
+    chmod 755 "$DIR"
+done
+
+echo "===== Completed: $(date) =====" >> "$LOG"
+
+
+*/5 * * * * /usr/local/bin/fix_world_writable.sh
