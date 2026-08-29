@@ -1,0 +1,7 @@
+Dear Team,
+This hang issue has occurred for the second time on the RHEL team side. For further analysis and RCA, the .vmem and .vmsn logs are required.
+Request you to please provide the following details:
+Share the download/location details for the required .vmem and .vmsn logs.
+Confirm the minimum and maximum downtime/window required to collect or share these logs.
+Please provide the feasible time window during which the activity can be performed and the required logs can be made available.
+As this is a recurring issue, your support in providing the logs and activity window on priority will help us proceed with detailed analysis and RCA.
