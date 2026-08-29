@@ -1,0 +1,6 @@
+Dear Team,
+We can change the permissions of the currently identified log files to the required compliant permissions. However, this will only be a temporary resolution if the application/process continues to generate new log files with the same world-writable permissions.
+If the same logs are generated again with world-writable permissions, the servers may again be reported as non-compliant in the subsequent SCGuard/SCD scan.
+Therefore, request you to please investigate and identify the root cause of why these log files are being created with world-writable permissions. Kindly implement a permanent fix at the application/process level to ensure that newly generated log files are created with the required permissions.
+Repeatedly changing the permissions manually after every occurrence may not be a sustainable solution and could result in recurring compliance observations.
+Please review and confirm the permanent corrective action and expected timeline for implementation
