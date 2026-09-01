@@ -1,0 +1,655 @@
+Oracle Database Backup & Recovery — Notes
+1. What is Backup?
+
+A backup is a copy of database information that can be used to restore the database after a failure.
+
+DATABASE
+    ↓
+  BACKUP
+    ↓
+Backup copy
+    ↓
+Failure
+    ↓
+RESTORE
+    ↓
+RECOVERY
+Why do we need backup?
+
+Backup protects against:
+
+Datafile loss/corruption
+Disk failure
+Database failure
+Accidental deletion
+Hardware failure
+Disaster
+User mistakes
+2. Backup vs Restore vs Recovery
+
+These three terms are very important.
+
+BACKUP
+
+Create a copy.
+
+Database → Backup
+RESTORE
+
+Bring the backup copy back to the required location.
+
+Backup → Datafile
+RECOVER
+
+Apply redo/archived redo to bring the restored files up to the required point.
+
+Restored Datafile
+       +
+Redo / Archived Redo
+       ↓
+   RECOVERY
+Easy way to remember
+
+Backup = Copy
+Restore = Put the copy back
+Recover = Apply changes after the backup
+
+3. Physical vs Logical Backup
+
+There are two broad types.
+
+                 BACKUP
+                    │
+          ┌─────────┴─────────┐
+          ↓                   ↓
+      PHYSICAL             LOGICAL
+Physical Backup
+
+Copies physical database files.
+
+Examples:
+
+Datafiles
+Control files
+SPFILE
+Archived redo logs
+
+The main Oracle tool is:
+
+RMAN — Recovery Manager
+
+Logical Backup
+
+Exports database objects such as:
+
+Tables
+Schemas
+Users' objects
+Metadata
+
+Oracle provides Data Pump Export (expdp) for this.
+
+4. Cold Backup
+
+A cold backup is taken when the database is shut down.
+
+Database OPEN
+      ↓
+SHUTDOWN
+      ↓
+Database CLOSED
+      ↓
+Copy database files
+      ↓
+Backup
+
+Because the database is not running, the files are not changing during the copy.
+
+Also called:
+
+Offline backup
+
+5. Hot Backup
+
+A hot backup is taken while the database is open.
+
+DATABASE
+   ↓
+OPEN
+   ↓
+Users working
+   ↓
+BACKUP
+
+Also called:
+
+Online backup
+
+For production databases, online backups are very useful because you don't have to stop the database.
+
+RMAN supports online database backup when the database is configured appropriately, typically with ARCHIVELOG mode.
+
+6. NOARCHIVELOG Mode
+
+In NOARCHIVELOG mode:
+
+Redo
+ ↓
+Online Redo Logs
+ ↓
+Not archived
+
+Recovery capability is limited.
+
+Suppose:
+
+10:00 → Backup
+11:00 → Transactions
+12:00 → Datafile failure
+
+In NOARCHIVELOG mode:
+
+10:00 Backup
+      ↓
+Restore
+      ↓
+Changes after backup
+      ↓
+May be LOST
+
+Therefore:
+
+NOARCHIVELOG is suitable for simple development/test environments where some data loss can be accepted.
+
+7. ARCHIVELOG Mode
+
+In ARCHIVELOG mode, Oracle preserves redo information by archiving filled online redo logs.
+
+Online Redo Log
+       ↓
+   Log Switch
+       ↓
+Archived Redo Log
+
+The archived redo can be used during recovery.
+
+Example:
+
+10:00 → Backup
+10:30 → Transactions
+11:00 → Transactions
+11:30 → Datafile failure
+
+Recovery can be:
+
+Backup
+   ↓
+Restore
+   ↓
+Apply archived redo
+   ↓
+Recover database
+
+This allows recovery much closer to the failure point, depending on the available backups and redo.
+
+8. Online Redo Log vs Archived Redo Log
+Online Redo Log
+
+Used continuously by the running database.
+
+Transaction
+    ↓
+Redo generated
+    ↓
+Online Redo Log
+Archived Redo Log
+
+Preserved redo information from an online redo log before it is reused.
+
+Online Redo Log
+       ↓
+    FULL
+       ↓
+  Log Switch
+       ↓
+Archived Redo Log
+Remember
+
+Online redo = current/reusable redo
+
+Archived redo = preserved redo used for recovery
+
+9. FRA — Fast Recovery Area
+
+FRA stands for:
+
+Fast Recovery Area
+
+It is an Oracle-managed storage location for recovery-related files.
+
+For example:
+
+D:\LABS\FRA
+
+It can contain:
+
+FRA
+ │
+ ├── RMAN Backups
+ ├── Archived Redo Logs
+ └── Flashback Logs
+
+Configure it with:
+
+ALTER SYSTEM SET db_recovery_file_dest='D:\LABS\FRA'
+SCOPE=BOTH;
+
+Set its size:
+
+ALTER SYSTEM SET db_recovery_file_dest_size=8G
+SCOPE=BOTH;
+
+Check:
+
+SHOW PARAMETER db_recovery;
+10. RMAN
+
+RMAN = Recovery Manager
+
+It is Oracle's primary tool for physical backup and recovery.
+
+Start RMAN:
+
+rman target /
+
+You will see:
+
+RMAN>
+
+Now you can execute RMAN commands.
+
+11. Full Database Backup
+
+Basic command:
+
+BACKUP DATABASE;
+
+This backs up the database's datafiles.
+
+A common practical backup is:
+
+BACKUP DATABASE PLUS ARCHIVELOG;
+
+This backs up:
+
+Database
+   +
+Archived Redo Logs
+
+For an ARCHIVELOG recovery strategy, having both is important.
+
+12. Backup a Specific Datafile
+
+Suppose datafile 7 is your USERS datafile.
+
+You can use:
+
+BACKUP DATAFILE 7;
+
+Or by file name:
+
+BACKUP DATAFILE 'D:\LABS\USERS01.DBF';
+13. Backup Control File
+
+The control file is extremely important because it contains database structural information.
+
+RMAN:
+
+BACKUP CURRENT CONTROLFILE;
+
+You can also configure automatic control-file/SPFILE backups:
+
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+
+Check configuration:
+
+SHOW ALL;
+14. Backup SPFILE
+
+You can back up the SPFILE:
+
+BACKUP SPFILE;
+
+Remember:
+
+PFILE → Text
+SPFILE → Binary
+15. Backup Archived Redo Logs
+BACKUP ARCHIVELOG ALL;
+
+This preserves archived redo for recovery.
+
+16. List Backups
+
+Inside RMAN:
+
+LIST BACKUP;
+
+This shows information about RMAN backups.
+
+You can also:
+
+LIST BACKUP OF DATABASE;
+17. Check Database Backup
+
+RMAN can validate backups:
+
+VALIDATE DATABASE;
+
+This checks whether database files can be read and are suitable for backup/recovery purposes.
+
+18. Restore
+
+Suppose a datafile is lost.
+
+Conceptually:
+
+Datafile lost
+     ↓
+RESTORE
+     ↓
+Backup copy brought back
+
+RMAN:
+
+RESTORE DATAFILE 7;
+
+But restore alone is not necessarily enough.
+
+You may then need:
+
+RECOVER DATAFILE 7;
+19. Restore vs Recover
+
+This is an important interview/exam question.
+
+RESTORE
+
+Gets the file from backup.
+
+Backup
+  ↓
+RESTORE
+  ↓
+Datafile
+RECOVER
+
+Applies redo to the restored file.
+
+Datafile
+   +
+Archived Redo
+   ↓
+RECOVER
+   ↓
+Current/required state
+
+Therefore:
+
+RESTORE gets the old copy back; RECOVER brings it forward using redo.
+
+20. Complete Media Recovery
+
+Suppose:
+
+USERS01.DBF
+
+is lost.
+
+The general process is:
+
+1. Identify failed datafile
+          ↓
+2. Restore datafile
+          ↓
+3. Recover datafile
+          ↓
+4. Bring it online
+
+Example:
+
+RESTORE DATAFILE 7;
+RECOVER DATAFILE 7;
+
+Then, depending on its state:
+
+ALTER DATABASE DATAFILE 7 ONLINE;
+21. Instance Recovery
+
+Instance failure is different.
+
+Example:
+
+Server crashes
+       ↓
+Oracle instance stops
+       ↓
+Database files are still present
+       ↓
+STARTUP
+       ↓
+Oracle performs instance recovery
+
+Oracle uses:
+
+Online redo
+Undo
+Checkpoint information
+
+to make the database consistent.
+
+You normally do not restore a backup just because of a normal instance crash.
+
+22. Media Recovery
+
+Media failure means physical files are lost or damaged.
+
+Example:
+
+Disk failure
+     ↓
+USERS01.DBF lost
+     ↓
+Restore backup
+     ↓
+Apply redo
+     ↓
+Recovery
+
+This is where ARCHIVELOG becomes especially important.
+
+23. Checkpoint and Recovery
+
+You previously looked at:
+
+SELECT file#, checkpoint_change#
+FROM v$datafile;
+
+For example:
+
+FILE#   CHECKPOINT_CHANGE#
+1       605006
+2       605006
+3       605006
+4       605006
+
+605006 is the checkpoint SCN.
+
+If datafiles have the same checkpoint SCN, they are synchronized with respect to that checkpoint.
+
+SCN
+
+SCN = System Change Number
+
+Oracle uses SCNs to track database changes and recovery progress.
+
+24. Why Checkpoints Matter
+
+Think:
+
+Database changes
+      ↓
+Redo generated
+      ↓
+Checkpoint
+      ↓
+Dirty blocks written to datafiles
+      ↓
+Checkpoint SCN recorded
+
+During recovery, Oracle uses checkpoint information to determine where recovery needs to begin.
+
+25. Backup Strategy
+
+A production backup strategy should consider:
+
+Database
+   │
+   ├── Datafile backups
+   ├── Controlfile backup
+   ├── SPFILE backup
+   └── Archived redo backups
+
+And importantly:
+
+Don't keep your only backup on the same physical disk as the database.
+
+For example, if:
+
+Database → D:
+Backup   → D:
+
+and the D: disk fails, you may lose both.
+
+Better:
+
+Database → D:
+Backup   → E: / Network / External storage
+26. The Big Picture
+
+This is the most important diagram to remember:
+
+                         DATABASE
+                            │
+             ┌──────────────┴──────────────┐
+             │                             │
+          DATAFILES                    REDO LOGS
+             │                             │
+             │                         Log Switch
+             │                             │
+             │                             ↓
+             │                       ARCHIVED REDO
+             │                             │
+             └──────────────┬──────────────┘
+                            ↓
+                          RMAN
+                            │
+                            ↓
+                         BACKUP
+                            │
+                            ↓
+                         FAILURE
+                            │
+                            ↓
+                         RESTORE
+                            │
+                            ↓
+                          REDO
+                            │
+                            ↓
+                         RECOVER
+                            │
+                            ↓
+                    DATABASE RECOVERED
+27. Commands to Memorize
+Check archive mode
+ARCHIVE LOG LIST;
+
+or:
+
+SELECT log_mode FROM v$database;
+Configure FRA
+ALTER SYSTEM SET db_recovery_file_dest='D:\LABS\FRA'
+SCOPE=BOTH;
+
+ALTER SYSTEM SET db_recovery_file_dest_size=8G
+SCOPE=BOTH;
+Start RMAN
+rman target /
+Full backup
+BACKUP DATABASE;
+Database + archive logs
+BACKUP DATABASE PLUS ARCHIVELOG;
+Datafile backup
+BACKUP DATAFILE 7;
+Archived redo backup
+BACKUP ARCHIVELOG ALL;
+Controlfile
+BACKUP CURRENT CONTROLFILE;
+SPFILE
+BACKUP SPFILE;
+List backups
+LIST BACKUP;
+Validate
+VALIDATE DATABASE;
+Restore
+RESTORE DATAFILE 7;
+Recover
+RECOVER DATAFILE 7;
+⭐ Final Memory Map
+BACKUP
+   │
+   ├── Physical → RMAN
+   └── Logical  → Data Pump
+   
+
+NOARCHIVELOG
+   │
+   └── Limited recovery
+
+
+ARCHIVELOG
+   │
+   └── Archived redo
+          │
+          ↓
+       Recovery
+
+
+FRA
+   │
+   ├── RMAN backups
+   ├── Archived redo
+   └── Flashback logs
+
+
+RESTORE
+   │
+   └── Get backup copy back
+
+
+RECOVER
+   │
+   └── Apply redo
+
+
+CHECKPOINT
+   │
+   └── Establishes recovery synchronization point
+
+
+SCN
+   │
+   └── System Change Number
+
+This is the core set of notes you need before starting hands-on RMAN backup and recovery.
