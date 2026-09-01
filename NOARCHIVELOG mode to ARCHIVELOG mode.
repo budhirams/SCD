@@ -1,4 +1,27 @@
-Based on the screenshot you shared, the activity performed was conversion of the Oracle database from NOARCHIVELOG mode to ARCHIVELOG mode.
+
+SELECT log_mode FROM v$database;
+
+
+
+LOG_MODE
+------------
+NOARCHIVELOG
+
+Then
+
+SHUTDOWN IMMEDIATE;
+STARTUP MOUNT;
+ALTER DATABASE ARCHIVELOG;
+ALTER DATABASE OPEN;
+
+SQL> ARCHIVE LOG LIST;
+
+
+
+
+
+
+.Based on the screenshot you shared, the activity performed was conversion of the Oracle database from NOARCHIVELOG mode to ARCHIVELOG mode.
 What was done
 Database was shut down
 SHUTDOWN IMMEDIATE;
