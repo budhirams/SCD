@@ -1,0 +1,694 @@
+Yes. I can turn this entire lab into a clean, terminal-based study record, showing Question → Command → Expected Terminal Output → What to Observe/Understand. This will also avoid the confusion we had when commands were executed under the wrong user.
+
+I’ll structure it so you can use it directly during future Oracle practice.
+
+Oracle DBA Lab — Users, Tablespaces & Privileges
+Lab Objective
+
+This exercise teaches:
+
+Creating a tablespace
+Creating users
+Assigning default tablespaces
+Understanding DBA_USERS
+CONNECT privilege
+RESOURCE privilege
+UNLIMITED TABLESPACE
+Creating tables
+Object privileges
+GRANT SELECT
+Schema-qualified table access
+System privileges
+WITH ADMIN OPTION
+Privilege propagation
+REVOKE
+Understanding why a revoked privilege may remain with a grantee
+Q1. Connect to ORCL / DEMO / Available Database
+Terminal
+C:\Users\Administrator>sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production
+...
+
+SQL> SHOW USER;
+USER is "SYS"
+Understand
+
+We connect as SYS because creating tablespaces and users requires administrative privileges.
+
+Q2. Create APPS_TBS of Size 10M
+
+The datafile must be named D1.DBF.
+
+SQL> CREATE TABLESPACE apps_tbs
+  2  DATAFILE 'D:\LABS\D1.DBF'
+  3  SIZE 10M;
+
+Tablespace created.
+Verify
+SQL> SELECT tablespace_name, file_name
+  2  FROM dba_data_files
+  3  WHERE tablespace_name = 'APPS_TBS';
+
+TABLESPACE_NAME
+------------------------------
+FILE_NAME
+--------------------------------------------------------------------------------
+APPS_TBS
+D:\LABS\D1.DBF
+Understand
+APPS_TBS = logical tablespace
+D1.DBF   = physical datafile
+10M      = initial size
+Q3. Create User GUEST
+
+Assign APPS_TBS as the default tablespace.
+
+SQL> CREATE USER guest
+  2  IDENTIFIED BY oracle
+  3  DEFAULT TABLESPACE apps_tbs;
+
+User created.
+Understand
+
+At this point:
+
+GUEST
+  |
+  └── Default Tablespace
+          |
+          └── APPS_TBS
+
+But GUEST cannot necessarily log in yet.
+
+Q4. Verify GUEST from DBA_USERS
+
+This must be done as SYS/privileged user.
+
+SQL> SELECT username, default_tablespace
+  2  FROM dba_users
+  3  WHERE username = 'GUEST';
+
+USERNAME
+--------------------------------------------------------------------------------
+DEFAULT_TABLESPACE
+------------------------------
+GUEST
+APPS_TBS
+Understand
+
+The Data Dictionary confirms:
+
+GUEST → APPS_TBS
+Q5. Connect as GUEST
+SQL> CONNECT guest/oracle
+Expected initially
+
+You may receive:
+
+ERROR:
+ORA-01045: user GUEST lacks CREATE SESSION privilege; logon denied
+Why?
+
+Creating a user does not automatically mean that the user can log in.
+
+GUEST needs:
+
+CREATE SESSION
+Q6. Grant CONNECT, RESOURCE & UNLIMITED TABLESPACE
+
+Connect back as SYS:
+
+SQL> CONNECT / AS SYSDBA
+Connected.
+
+Then:
+
+SQL> GRANT CONNECT, RESOURCE, UNLIMITED TABLESPACE TO guest;
+
+Grant succeeded.
+Understand
+
+The lab's hint is:
+
+GRANT CONNECT, RESOURCE, UNLIMITED TABLESPACE TO guest;
+
+Conceptually:
+
+CONNECT
+   ↓
+Allows session/login
+
+RESOURCE
+   ↓
+Provides commonly used object-creation privileges
+
+UNLIMITED TABLESPACE
+   ↓
+No tablespace quota restriction for the user
+Q7. Check GUEST Connection
+SQL> CONNECT guest/oracle
+Connected.
+
+SQL> SHOW USER;
+USER is "GUEST"
+
+Now GUEST can log in.
+
+Q8. Create EMP Under GUEST
+
+This is an important step.
+
+You are now:
+
+USER = GUEST
+
+Create the table:
+
+SQL> CREATE TABLE emp (
+  2      code NUMBER,
+  3      name VARCHAR2(50)
+  4  );
+
+Table created.
+Verify
+SQL> SELECT table_name
+  2  FROM user_tables;
+
+TABLE_NAME
+--------------------------------------------------------------------------------
+EMP
+
+Insert records:
+
+SQL> INSERT INTO emp VALUES (1, 'Oracle');
+
+1 row created.
+
+SQL> INSERT INTO emp VALUES (2, 'Database');
+
+1 row created.
+
+SQL> INSERT INTO emp VALUES (3, 'Tablespace');
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+Check:
+
+SQL> SELECT * FROM emp;
+
+      CODE NAME
+---------- --------------------------------------------------
+         1 Oracle
+         2 Database
+         3 Tablespace
+Understand
+
+Now the important object exists:
+
+GUEST schema
+     |
+     └── EMP
+          ├── CODE
+          └── NAME
+Q9. Create DEV_USR
+
+Connect as SYS:
+
+SQL> CONNECT / AS SYSDBA
+Connected.
+
+Create the user:
+
+SQL> CREATE USER dev_usr
+  2  IDENTIFIED BY oracle
+  3  DEFAULT TABLESPACE apps_tbs;
+
+User created.
+Q10. Repeat Q4, Q5 & Q6 for DEV_USR
+Q10A — Check DEV_USR
+SQL> SELECT username, default_tablespace
+  2  FROM dba_users
+  3  WHERE username = 'DEV_USR';
+
+USERNAME
+--------------------------------------------------------------------------------
+DEFAULT_TABLESPACE
+------------------------------
+DEV_USR
+APPS_TBS
+Q10B — Try connecting
+SQL> CONNECT dev_usr/oracle
+
+Initially, login should fail because DEV_USR has not yet been granted CREATE SESSION.
+
+Q10C — Grant privileges
+
+Connect as SYS:
+
+SQL> CONNECT / AS SYSDBA
+Connected.
+
+SQL> GRANT CONNECT, RESOURCE, UNLIMITED TABLESPACE TO dev_usr;
+
+Grant succeeded.
+
+Now:
+
+SQL> CONNECT dev_usr/oracle
+Connected.
+
+SQL> SHOW USER;
+USER is "DEV_USR"
+Q11. GUEST Grants SELECT on EMP to DEV_USR
+
+This is where you previously got:
+
+ORA-00942
+
+because GUEST.EMP had not yet been created.
+
+Now it exists.
+
+Connect as GUEST:
+
+SQL> CONNECT guest/oracle
+Connected.
+
+SQL> SHOW USER;
+USER is "GUEST"
+
+Grant:
+
+SQL> GRANT SELECT ON emp TO dev_usr;
+
+Grant succeeded.
+Understand
+
+The privilege flow is:
+
+GUEST
+  |
+  └── EMP
+       |
+       | SELECT privilege
+       ↓
+    DEV_USR
+Q12. DEV_USR Queries GUEST.EMP
+
+Connect as DEV_USR:
+
+SQL> CONNECT dev_usr/oracle
+Connected.
+
+SQL> SELECT * FROM guest.emp;
+
+      CODE NAME
+---------- --------------------------------------------------
+         1 Oracle
+         2 Database
+         3 Tablespace
+Why guest.emp?
+
+Because EMP belongs to GUEST.
+
+guest.emp
+   ↑
+schema.table
+
+If you simply write:
+
+SELECT * FROM emp;
+
+Oracle looks for:
+
+DEV_USR.EMP
+
+because the current user is DEV_USR.
+
+Q13. DEV_USR Creates Another EMP
+
+You are already DEV_USR.
+
+SQL> CREATE TABLE emp (
+  2      c1 NUMBER,
+  3      c2 VARCHAR2(50),
+  4      c3 VARCHAR2(50)
+  5  );
+
+Table created.
+Important concept
+
+Now there are two EMP tables:
+
+GUEST
+ └── EMP
+      CODE
+      NAME
+
+DEV_USR
+ └── EMP
+      C1
+      C2
+      C3
+
+Same table name, different schemas.
+
+Q14. Insert Records into DEV_USR.EMP
+SQL> INSERT INTO emp VALUES (1, 'A', 'Oracle');
+
+1 row created.
+
+SQL> INSERT INTO emp VALUES (2, 'B', 'Database');
+
+1 row created.
+
+SQL> INSERT INTO emp VALUES (3, 'C', 'Admin');
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+Check:
+
+SQL> SELECT * FROM emp;
+
+        C1 C2       C3
+---------- -------- ------------------
+         1 A        Oracle
+         2 B        Database
+         3 C        Admin
+Q15. DEV_USR Grants SELECT on EMP to HR
+
+Because DEV_USR owns this EMP, remain connected as DEV_USR.
+
+SQL> SHOW USER;
+USER is "DEV_USR"
+
+Then:
+
+SQL> GRANT SELECT ON emp TO hr;
+
+Grant succeeded.
+Understand
+DEV_USR
+   |
+   └── EMP
+        |
+        | SELECT
+        ↓
+       HR
+Q16. HR Checks the Privilege
+
+Connect as HR.
+
+If you don't know the HR password, as SYS:
+
+SQL> CONNECT / AS SYSDBA
+Connected.
+
+SQL> ALTER USER hr IDENTIFIED BY oracle;
+
+User altered.
+
+Then:
+
+SQL> CONNECT hr/oracle
+Connected.
+
+SQL> SHOW USER;
+USER is "HR"
+
+Query:
+
+SQL> SELECT * FROM dev_usr.emp;
+
+        C1 C2       C3
+---------- -------- ------------------
+         1 A        Oracle
+         2 B        Database
+         3 C        Admin
+Understand
+
+HR can access:
+
+DEV_USR.EMP
+
+because DEV_USR granted SELECT to HR.
+
+Q17. SYS Grants CREATE USER to HR WITH ADMIN OPTION
+
+Connect as SYS:
+
+SQL> CONNECT / AS SYSDBA
+Connected.
+
+Run:
+
+SQL> GRANT CREATE USER TO hr WITH ADMIN OPTION;
+
+Grant succeeded.
+Important
+
+CREATE USER is a system privilege.
+
+For system privileges:
+
+WITH ADMIN OPTION
+
+means the recipient can grant that system privilege to another user.
+
+Q18. HR Grants CREATE USER to DEV_USR
+
+Connect as HR:
+
+SQL> CONNECT hr/oracle
+Connected.
+
+SQL> SHOW USER;
+USER is "HR"
+
+Then:
+
+SQL> GRANT CREATE USER TO dev_usr;
+
+Grant succeeded.
+
+Privilege chain:
+
+SYS
+ │
+ │ CREATE USER
+ │ WITH ADMIN OPTION
+ ↓
+HR
+ │
+ │ CREATE USER
+ ↓
+DEV_USR
+Q19. Check Whether DEV_USR Can Create a User
+
+Connect:
+
+SQL> CONNECT dev_usr/oracle
+Connected.
+
+Try:
+
+SQL> CREATE USER testuser IDENTIFIED BY oracle;
+
+User created.
+
+Therefore:
+
+DEV_USR has CREATE USER
+Q20. SYS Revokes CREATE USER From HR
+
+Connect as SYS:
+
+SQL> CONNECT / AS SYSDBA
+Connected.
+
+Run:
+
+SQL> REVOKE CREATE USER FROM hr;
+
+Revoke succeeded.
+
+HR no longer has the privilege.
+
+Q21. DEV_USR Creates USERNEW
+
+Connect:
+
+SQL> CONNECT dev_usr/oracle
+Connected.
+
+Now:
+
+SQL> CREATE USER usernew IDENTIFIED BY oracle;
+
+User created.
+Observation
+
+This is the important result of the exercise.
+
+Even though SYS revoked CREATE USER from HR, the CREATE USER privilege that HR had already granted to DEV_USR remains with DEV_USR.
+
+Q22. Final Observation
+
+Write this in your lab record:
+
+Observation: SYS granted the CREATE USER system privilege to HR with ADMIN OPTION. Therefore, HR was authorized to grant the same system privilege to DEV_USR. After SYS revoked CREATE USER from HR, the privilege previously granted by HR to DEV_USR was not automatically revoked. DEV_USR therefore continued to possess the CREATE USER privilege and was able to create USERNEW.
+
+⭐ Most Important Concepts From This Lab
+1. Schema vs Tablespace
+SCHEMA
+   ↓
+Owns database objects
+
+TABLESPACE
+   ↓
+Provides logical storage
+
+Example:
+
+GUEST
+  |
+  └── EMP
+       |
+       └── stored in APPS_TBS
+2. Same Table Name Can Exist in Different Schemas
+GUEST.EMP
+       ↓
+CODE, NAME
+
+DEV_USR.EMP
+       ↓
+C1, C2, C3
+
+Therefore:
+
+SELECT * FROM emp;
+
+means:
+
+current_user.emp
+
+while:
+
+SELECT * FROM guest.emp;
+
+explicitly means:
+
+GUEST.EMP
+3. Object Privilege
+
+Example:
+
+GRANT SELECT ON emp TO dev_usr;
+
+This is an object privilege.
+
+Concept:
+
+GUEST owns EMP
+        ↓
+GUEST grants SELECT
+        ↓
+DEV_USR can SELECT
+4. System Privilege
+
+Example:
+
+GRANT CREATE USER TO hr WITH ADMIN OPTION;
+
+CREATE USER is a system privilege.
+
+5. ADMIN OPTION
+GRANT CREATE USER TO hr WITH ADMIN OPTION;
+
+means:
+
+HR can use CREATE USER
++
+HR can grant CREATE USER to another user
+6. GRANT OPTION vs ADMIN OPTION
+
+Remember this for exams:
+
+SYSTEM PRIVILEGE
+      ↓
+WITH ADMIN OPTION
+
+OBJECT PRIVILEGE
+      ↓
+WITH GRANT OPTION
+
+Example:
+
+GRANT CREATE USER TO hr WITH ADMIN OPTION;
+
+versus:
+
+GRANT SELECT ON emp TO dev_usr WITH GRANT OPTION;
+Complete Privilege Flow
+                         SYS
+                          │
+                          │ CREATE USER
+                          │ WITH ADMIN OPTION
+                          ↓
+                         HR
+                          │
+                          │ CREATE USER
+                          ↓
+                       DEV_USR
+                          │
+                          ↓
+                    CREATE USER
+                          │
+                          ↓
+                       USERNEW
+
+And object privileges:
+
+GUEST
+  │
+  └── EMP
+       │
+       │ GRANT SELECT
+       ↓
+    DEV_USR
+       │
+       └── SELECT * FROM GUEST.EMP
+
+
+DEV_USR
+   │
+   └── EMP
+        │
+        │ GRANT SELECT
+        ↓
+       HR
+One Very Important Terminal Rule
+
+Keep checking:
+
+SHOW USER;
+
+before executing a GRANT, CREATE USER, CREATE TABLE, etc.
+
+For this lab:
+
+SYS      → creates tablespaces/users, grants system privileges
+GUEST    → creates GUEST.EMP and grants SELECT
+DEV_USR  → creates DEV_USR.EMP and grants SELECT
+HR       → receives SELECT and later receives/forwards CREATE USER
+
+This one habit would have prevented almost all of the errors you encountered during the lab.
