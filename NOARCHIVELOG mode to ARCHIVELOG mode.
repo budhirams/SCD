@@ -1,4 +1,13 @@
 
+Simple explanation
+SHUTDOWN IMMEDIATE → safely stops database activity and closes the database.
+STARTUP MOUNT → starts the Oracle instance and mounts the database, but does not open it to users.
+In this state, Oracle allows the ARCHIVELOG configuration change.
+Then ALTER DATABASE OPEN → brings the database back for normal application/user access.
+So, shutdown was required to move the database from OPEN → MOUNT state safely and enable ARCHIVELOG mode.
+
+
+
 SELECT log_mode FROM v$database;
 
 
