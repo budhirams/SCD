@@ -1,0 +1,33 @@
+Based on the screenshot you shared, the activity performed was conversion of the Oracle database from NOARCHIVELOG mode to ARCHIVELOG mode.
+What was done
+Database was shut down
+SHUTDOWN IMMEDIATE;
+Database was started in MOUNT mode
+STARTUP MOUNT;
+Screenshot shows:
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+ORACLE instance started.
+Database mounted.
+ARCHIVELOG mode was enabled
+ALTER DATABASE ARCHIVELOG;
+Output:
+Database altered.
+Database was opened
+ALTER DATABASE OPEN;
+Output:
+Database altered.
+ARCHIVELOG status was verified
+ARCHIVE LOG LIST;
+Screenshot confirms:
+Database log mode              Archive Mode
+Automatic archival             Enabled
+Archive destination            USE_DB_RECOVERY_FILE_DEST
+Redo log switches were performed
+ALTER SYSTEM SWITCH LOGFILE;
+This was executed multiple times successfully:
+System altered.
+Final status
+NOARCHIVELOG → ARCHIVELOG conversion completed successfully. ✅
+The screenshot confirms that ARCHIVELOG mode is currently enabled and automatic archival is enabled.
