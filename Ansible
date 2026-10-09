@@ -1,0 +1,403 @@
+ 1001  cd /opt/ansible/
+ 1002  ls
+ 1003  ls -lrth
+ 1004  ls *cis*
+ 1005  history
+[root@DEVDEVOPSUAT03 ansible]# pwd
+/opt/ansible
+[root@DEVDEVOPSUAT03 ansible]# cd ../scd/
+[root@DEVDEVOPSUAT03 scd]# cat /opt/scd/cis_hardening.yml
+---
+- name: CIS Hardening Playbook
+  hosts: all
+  become: yes
+  gather_facts: false
+  strategy: free
+
+  tasks:
+
+    - name: Copy CIS modprobe.d conf
+      copy:
+        src: /etc/modprobe.d/CIS.conf
+        dest: /etc/modprobe.d/CIS.conf
+
+    - name: Set correct permissions on CIS.conf
+      shell: chmod 644 /etc/modprobe.d/CIS.conf
+
+    - name: Remove /etc/at.deny
+      shell: rm -f /etc/at.deny
+
+    - name: Enable crond service
+      shell: systemctl enable crond.service
+
+    - name: Ensure /etc/dconf/db/gdm.d directory exists
+      file:
+        path: /etc/dconf/db/gdm.d
+        state: directory
+        mode: '0755'
+
+    - name: Ensure GDM login banner message file is correctly configured
+      copy:
+        dest: /etc/dconf/db/gdm.d/01-banner-message
+        content: |
+          [org/gnome/login-screen]
+          banner-message-enable=true
+          banner-message-text='WARNING: This system is for the use of authorized users for authorized purposes only. Activities on this system are being recorded and monitored by the Bank. Individuals, using this system without authority, or in excess of their authority shall be treated as having violated the IT Policy and IS Policy of the Bank and, are subject to legal/disciplinary actions as per the policy of the Bank.'
+
+    - name: Run dconf update to apply banner message
+      shell: dconf update
+      ignore_errors: true
+
+    - name: Ensure reference authselect snippet directory exists (for record keeping)
+      shell: mkdir -p /etc/authselect/custom/sssd
+
+    - name: Copy reference password-auth snippet
+      copy:
+        src: /etc/authselect/custom/sssd/password-auth
+        dest: /etc/authselect/custom/sssd/password-auth
+
+    - name: Copy reference system-auth snippet
+      copy:
+        src: /etc/authselect/custom/sssd/system-auth
+        dest: /etc/authselect/custom/sssd/system-auth
+
+    - name: Select authselect sssd profile with faillock and pwhistory
+      shell: authselect select sssd with-faillock with-pwhistory --force
+      ignore_errors: true
+
+    - name: Apply authselect changes
+      shell: authselect apply-changes
+      ignore_errors: true
+
+    - name: Add AIDE check cron job
+      cron:
+        name: "side check job"
+        minute: "0"
+        hour: "5"
+        job: "/usr/sbin/aide --check"
+
+    - name: Update /tmp mount options in fstab (nodev,nosuid,noexec)
+      shell: >
+        sed -i 's|/dev/mapper/rhel-tmp[[:space:]]\+/tmp[[:space:]]\+xfs[[:space:]]\+defaults[[:space:]]\+0[[:space:]]\+0|/dev/mapper/rhel-tmp   /tmp    xfs   defaults,nodev,nosuid,noexec 0 0|' /etc/fstab
+
+    - name: Add hardened tmpfs entry for /dev/shm in fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: '^tmpfs\s+/dev/shm\s+'
+        line: "tmpfs   /dev/shm    tmpfs   defaults,nodev,nosuid,noexec   0 0"
+        state: present
+
+    - name: Set pwquality minlen to 14
+      replace:
+        path: /etc/security/pwquality.conf
+        regexp: '^#?[ \t]*minlen[ \t]*=[ \t]*\d+'
+        replace: 'minlen = 14'
+
+    - name: Set pwquality retry to 3
+      replace:
+        path: /etc/security/pwquality.conf
+        regexp: '^#?[ \t]*retry[ \t]*=[ \t]*\d+'
+        replace: 'retry = 3'
+
+    - name: Set pwquality minclass to 4
+      replace:
+        path: /etc/security/pwquality.conf
+        regexp: '^#?[ \t]*minclass[ \t]*=[ \t]*\d+'
+        replace: 'minclass = 4'
+
+    - name: Set pwhistory remember to 5
+      replace:
+        path: /etc/security/pwhistory.conf
+        regexp: '#\s*remember\s*=\s*10'
+        replace: 'remember = 5'
+
+    - name: Set faillock deny to 5
+      replace:
+        path: /etc/security/faillock.conf
+        regexp: '#\s*deny\s*=\s*3'
+        replace: 'deny = 5'
+
+    - name: Set faillock unlock_time to 900
+      replace:
+        path: /etc/security/faillock.conf
+        regexp: '#\s*unlock_time\s*=\s*600'
+        replace: 'unlock_time = 900'
+
+    - name: Enable faillock audit
+      replace:
+        path: /etc/security/faillock.conf
+        regexp: '#\s*audit'
+        replace: 'audit'
+
+    - name: Enable faillock silent
+      replace:
+        path: /etc/security/faillock.conf
+        regexp: '#\s*silent'
+        replace: 'silent'
+
+    - name: Remove duplicate lines from PAM config files
+      shell: awk '!seen[$0]++' {{ item }} > {{ item }}.tmp && mv {{ item }}.tmp {{ item }}
+      loop:
+        - /etc/security/pwquality.conf
+        - /etc/security/pwhistory.conf
+        - /etc/security/faillock.conf
+
+    - name: Remove xorg-x11 packages only (without removing dependents like java)
+      shell: |
+        pkgs=$(rpm -qa 'xorg-x11*')
+        if [ -n "$pkgs" ]; then
+          rpm -e --nodeps $pkgs && echo REMOVED
+        fi
+      register: xorg_remove
+      changed_when: "'REMOVED' in xorg_remove.stdout"
+
+    - name: Reload systemd daemon
+      shell: systemctl daemon-reload
+
+    - name: Remount /tmp
+      shell: mount -o remount /tmp
+
+    - name: Remount /dev/shm
+      shell: mount -o remount /dev/shm
+
+    - name: Copy compliant sshd_config from Ansible control node
+      copy:
+        src: /etc/ssh/sshd_config
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: '0600'
+        validate: /usr/sbin/sshd -t -f %s
+      register: sshd_config_copy
+
+    - name: Ensure all files under /etc/ssh are owned by root:root
+      shell: find /etc/ssh ! \( -user root -group root \) -print -exec chown -h root:root {} \;
+      register: ssh_owner
+      changed_when: 'ssh_owner.stdout != ""'
+
+    - name: Ensure SSH private host keys have 0600 permissions
+      shell: find /etc/ssh -maxdepth 1 -type f -name 'ssh_host_*_key' ! -perm 0600 -print -exec chmod 0600 {} \;
+      register: ssh_priv_perm
+      changed_when: 'ssh_priv_perm.stdout != ""'
+
+    - name: Ensure SSH public host keys have 0644 permissions
+      shell: find /etc/ssh -maxdepth 1 -type f -name 'ssh_host_*_key.pub' ! -perm 0644 -print -exec chmod 0644 {} \;
+      register: ssh_pub_perm
+      changed_when: 'ssh_pub_perm.stdout != ""'
+
+    - name: Restart sshd to apply new config
+      shell: systemctl restart sshd
+      when: sshd_config_copy.changed
+
+    - name: Remove old custom sysctl hardening file if present
+      file:
+        path: /etc/sysctl.d/99-custom-hardening.conf
+        state: absent
+
+    - name: Set required network sysctl parameters in /etc/sysctl.conf
+      lineinfile:
+        path: /etc/sysctl.conf
+        regexp: "^{{ item.name }}\\s*="
+        line: "{{ item.name }} = {{ item.value }}"
+        state: present
+      loop:
+        - { name: "net.ipv4.conf.all.rp_filter", value: "1" }
+        - { name: "net.ipv4.conf.default.rp_filter", value: "1" }
+        - { name: "net.ipv4.conf.all.send_redirects", value: "0" }
+        - { name: "net.ipv4.conf.default.send_redirects", value: "0" }
+        - { name: "net.ipv4.icmp_ignore_bogus_error_responses", value: "1" }
+        - { name: "net.ipv4.ip_forward", value: "0" }
+        - { name: "net.ipv4.tcp_syncookies", value: "1" }
+
+    - name: Reload all sysctl settings (system-wide)
+      shell: sysctl --system
+
+    - name: Stop and disable avahi-daemon service
+      shell: systemctl stop avahi-daemon.socket avahi-daemon.service; systemctl disable avahi-daemon.socket avahi-daemon.service
+      ignore_errors: true
+
+    - name: Remove avahi packages only (without removing dependents like java)
+      shell: |
+        pkgs=$(rpm -qa 'avahi*')
+        if [ -n "$pkgs" ]; then
+          rpm -e --nodeps $pkgs && echo REMOVED
+        fi
+      register: avahi_remove
+      changed_when: "'REMOVED' in avahi_remove.stdout"
+
+    - name: Copy audit.rules to remote hosts
+      copy:
+        src: /etc/audit/rules.d/audit.rules
+        dest: /etc/audit/rules.d/audit.rules
+
+    - name: Copy audit.rules to remote hosts
+      copy:
+        src: /etc/audit/auditd.conf
+        dest: /etc/audit/auditd.conf
+
+    - name: Fix invalid auid!=unaudited syntax in audit.rules
+      replace:
+        path: /etc/audit/rules.d/audit.rules
+        regexp: 'auid!=unaudited'
+        replace: 'auid!=4294967295'
+
+    - name: Remove duplicate lines from audit.rules
+      shell: awk '!seen[$0]++' /etc/audit/rules.d/audit.rules > /etc/audit/rules.d/audit.rules.tmp && mv /etc/audit/rules.d/audit.rules.tmp /etc/audit/rules.d/audit.rules
+
+    - name: Restart auditd to load new audit rules
+      shell: service auditd restart
+
+    - name: Set coredump Storage to none
+      lineinfile:
+        path: /etc/systemd/coredump.conf
+        regexp: '^#?\s*Storage\s*='
+        line: 'Storage=none'
+        insertafter: '^\[Coredump\]'
+
+    - name: Set coredump ProcessSizeMax to 0
+      lineinfile:
+        path: /etc/systemd/coredump.conf
+        regexp: '^#?\s*ProcessSizeMax\s*='
+        line: 'ProcessSizeMax=0'
+        insertafter: '^\[Coredump\]'
+
+    - name: Stop and disable cups service
+      shell: systemctl stop cups; systemctl disable cups
+      ignore_errors: true
+
+    - name: Remove cups packages only (without removing dependents like java)
+      shell: |
+        pkgs=$(rpm -qa 'cups*')
+        if [ -n "$pkgs" ]; then
+          rpm -e --nodeps $pkgs && echo REMOVED
+        fi
+      register: cups_remove
+      changed_when: "'REMOVED' in cups_remove.stdout"
+
+    - name: Set password aging defaults in login.defs
+      lineinfile:
+        path: /etc/login.defs
+        regexp: '^\s*{{ item.key }}\s+'
+        line: '{{ item.key }}   {{ item.value }}'
+      loop:
+        - { key: PASS_MAX_DAYS, value: 90 }
+        - { key: PASS_MIN_DAYS, value: 7 }
+        - { key: PASS_WARN_AGE, value: 14 }
+
+    - name: Set INACTIVE=30 in /etc/default/useradd
+      lineinfile:
+        path: /etc/default/useradd
+        regexp: '^\s*INACTIVE\s*='
+        line: 'INACTIVE=30'
+
+    - name: Set shell idle timeout TMOUT=900
+      copy:
+        dest: /etc/profile.d/tmout.sh
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          TMOUT=900
+          export TMOUT
+
+    - name: Set TMOUT=900 in /etc/bashrc
+      lineinfile:
+        path: /etc/bashrc
+        regexp: '^\s*(readonly\s+)?TMOUT\s*='
+        line: 'TMOUT=900'
+        insertafter: EOF
+
+    - name: Enforce password aging policy (min 7, max 90, warn 14) for normal users
+      shell: |
+        for user in $(awk -F: '($3>=1000)&&($3!=65534){print $1}' /etc/passwd); do
+          current_min=$(chage -l "$user" | awk -F': ' '/Minimum number of days between password change/{print $2}')
+          current_max=$(chage -l "$user" | awk -F': ' '/Maximum number of days between password change/{print $2}')
+          current_warn=$(chage -l "$user" | awk -F': ' '/Number of days of warning before password expires/{print $2}')
+          if [ "$current_min" != "7" ] || [ "$current_max" != "90" ] || [ "$current_warn" != "14" ]; then
+            chage -m 7 -M 90 -W 14 "$user"
+          fi
+        done
+
+    - name: Enforce password aging policy for root users
+      shell: |
+        current_min=$(chage -l root | awk -F': ' '/Minimum number of days between password change/{print $2}')
+        current_max=$(chage -l root | awk -F': ' '/Maximum number of days between password change/{print $2}')
+        current_warn=$(chage -l root | awk -F': ' '/Number of days of warning before password expires/{print $2}')
+        if [ "$current_min" != "7" ] || [ "$current_max" != "90" ] || [ "$current_warn" != "14" ]; then
+          chage -m 7 -M 90 -W 14 root
+        fi
+
+    - name: Remove /etc/cron.deny if present
+      file:
+        path: /etc/cron.deny
+        state: absent
+
+    - name: Create /etc/cron.allow only if missing
+      copy:
+        content: ""
+        dest: /etc/cron.allow
+        force: no
+        owner: root
+        group: root
+        mode: '0640'
+
+    - name: Secure cron files and directories (root:root, og-rwx)
+      file:
+        path: "{{ item.path }}"
+        state: "{{ item.state }}"
+        owner: root
+        group: root
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: /etc/crontab, state: file, mode: '0600' }
+        - { path: /etc/cron.allow, state: file, mode: '0640' }
+        - { path: /etc/cron.d, state: directory, mode: '0700' }
+        - { path: /etc/cron.daily, state: directory, mode: '0700' }
+        - { path: /etc/cron.hourly, state: directory, mode: '0700' }
+        - { path: /etc/cron.monthly, state: directory, mode: '0700' }
+        - { path: /etc/cron.weekly, state: directory, mode: '0700' }
+
+    - name: Check if grub.cfg exists
+      stat:
+        path: /boot/grub2/grub.cfg
+      register: grub_cfg_stat
+
+    - name: Generate grub.cfg if missing
+      shell: grub2-mkconfig -o /boot/grub2/grub.cfg
+      when: not grub_cfg_stat.stat.exists
+
+    - name: Set correct ownership and permissions on grub.cfg
+      file:
+        path: /boot/grub2/grub.cfg
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Check if grubenv exists
+      stat:
+        path: /boot/grub2/grubenv
+      register: grubenv_stat
+
+    - name: Set correct ownership and permissions on grubenv
+      file:
+        path: /boot/grub2/grubenv
+        owner: root
+        group: root
+        mode: '0600'
+      when: grubenv_stat.stat.exists
+
+    - name: Disable named (BIND) service (no stop, no package removal)
+      shell: systemctl disable named
+      ignore_errors: true
+
+    - name: Disable rpcbind service (no stop, no package removal)
+      shell: systemctl disable rpcbind
+      ignore_errors: true
+
+    - name: Stop and disable telnet service
+      shell: systemctl stop telnet.socket; systemctl disable telnet.socket
+      ignore_errors: true
+
+    - name: Remove telnet packages
+      shell: yum remove -y telnet telnet-server
+      ignore_errors: true
