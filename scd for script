@@ -108,3 +108,22 @@ echo "  cat /etc/modprobe.d/scd14.conf"
 echo "  grep -E '[[:space:]]/(home|tmp|dev/shm)[[:space:]]' /etc/fstab"
 echo "  findmnt /home /tmp /dev/shm"
 
+
+
+[root@CMPiCASHPROELK01SIT script]# sh scdpoint.sh
+Backup directory: /var/backups/scd14_20261009_120351
+Updated /etc/modprobe.d/scd14.conf
+Updated /etc/fstab
+mount: (hint) your fstab has been modified, but systemd still uses
+       the old version; use 'systemctl daemon-reload' to reload.
+mount: (hint) your fstab has been modified, but systemd still uses
+       the old version; use 'systemctl daemon-reload' to reload.
+mount: (hint) your fstab has been modified, but systemd still uses
+       the old version; use 'systemctl daemon-reload' to reload.
+SCD14 configuration completed.
+Verify with:
+  cat /etc/modprobe.d/scd14.conf
+  grep -E '[[:space:]]/(home|tmp|dev/shm)[[:space:]]' /etc/fstab
+  findmnt /home /tmp /dev/shm
+
+
