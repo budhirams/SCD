@@ -1,0 +1,25 @@
+create a file /etc/modprobe.d/scd14.conf and entry below
+install cramfs /bin/true
+install squashfs /bin/true
+install udf /bin/true
+install usb-storage /bin/true
+install dccp /bin/true
+install sctp /bin/true
+install rds /bin/true
+install tipc /bin/true
+
+after that this should be entry in fstab
+
+/dev/mapper/rhel-home   /home                   xfs     defaults,nodev        0 0
+/dev/mapper/rhel-tmp    /tmp                    xfs     defaults,nodev,nosuid,noexec        0 0
+tmpfs /dev/shm tmpfs defaults,nodev,nosuid,noexec 0 0
+
+if found or not found it should be entry like that 
+
+
+after that run below command 
+
+mount -o remount,rw,nodev,nosuid,noexec /tmp
+mount -o remount,rw,nodev /home
+mount -o remount,rw,nodev,nosuid,noexec /dev/shm/
+systemctl daemon-reload
