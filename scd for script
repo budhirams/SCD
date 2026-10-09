@@ -23,3 +23,88 @@ mount -o remount,rw,nodev,nosuid,noexec /tmp
 mount -o remount,rw,nodev /home
 mount -o remount,rw,nodev,nosuid,noexec /dev/shm/
 systemctl daemon-reload
+
+
+
+
+
+
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Configure SCD14 kernel module restrictions and mount options.
+# Run as root. A timestamped backup is created before changing files.
+
+if [[ "${EUID}" -ne 0 ]]; then
+  echo "ERROR: Run this script as root." >&2
+  exit 1
+fi
+
+timestamp="$(date +%Y%m%d_%H%M%S)"
+backup_dir="/var/backups/scd14_${timestamp}"
+mkdir -p "$backup_dir"
+
+[[ -f /etc/fstab ]] && cp -p /etc/fstab "$backup_dir/fstab"
+[[ -f /etc/modprobe.d/scd14.conf ]] && cp -p /etc/modprobe.d/scd14.conf "$backup_dir/scd14.conf"
+echo "Backup directory: $backup_dir"
+
+cat > /etc/modprobe.d/scd14.conf <<'MODPROBE_EOF'
+install cramfs /bin/true
+install squashfs /bin/true
+install udf /bin/true
+install usb-storage /bin/true
+install dccp /bin/true
+install sctp /bin/true
+install rds /bin/true
+install tipc /bin/true
+MODPROBE_EOF
+chmod 0644 /etc/modprobe.d/scd14.conf
+echo "Updated /etc/modprobe.d/scd14.conf"
+
+# Replace an existing entry by mount point, or append it if not present.
+tmp_fstab="$(mktemp /etc/fstab.XXXXXX)"
+awk '
+BEGIN {
+  home_line = "/dev/mapper/rhel-home   /home                   xfs     defaults,nodev        0 0"
+  tmp_line  = "/dev/mapper/rhel-tmp    /tmp                    xfs     defaults,nodev,nosuid,noexec        0 0"
+  shm_line  = "tmpfs /dev/shm tmpfs defaults,nodev,nosuid,noexec 0 0"
+}
+{
+  if ($0 ~ /^[[:space:]]*#/ || NF < 2) { print; next }
+  if ($2 == "/home") {
+    if (!home_done) print home_line
+    home_done = 1; next
+  }
+  if ($2 == "/tmp") {
+    if (!tmp_done) print tmp_line
+    tmp_done = 1; next
+  }
+  if ($2 == "/dev/shm") {
+    if (!shm_done) print shm_line
+    shm_done = 1; next
+  }
+  print
+}
+END {
+  if (!home_done) print home_line
+  if (!tmp_done) print tmp_line
+  if (!shm_done) print shm_line
+}
+' /etc/fstab > "$tmp_fstab"
+chown --reference=/etc/fstab "$tmp_fstab"
+chmod --reference=/etc/fstab "$tmp_fstab"
+mv "$tmp_fstab" /etc/fstab
+echo "Updated /etc/fstab"
+
+mount -o remount,rw,nodev,nosuid,noexec /tmp
+mount -o remount,rw,nodev /home
+mount -o remount,rw,nodev,nosuid,noexec /dev/shm/
+systemctl daemon-reload
+
+echo "SCD14 configuration completed."
+echo "Verify with:"
+echo "  cat /etc/modprobe.d/scd14.conf"
+echo "  grep -E '[[:space:]]/(home|tmp|dev/shm)[[:space:]]' /etc/fstab"
+echo "  findmnt /home /tmp /dev/shm"
+
