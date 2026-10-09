@@ -401,3 +401,187 @@
     - name: Remove telnet packages
       shell: yum remove -y telnet telnet-server
       ignore_errors: true
+
+
+
+#!/usr/bin/env bash
+# Local Bash equivalent of the supplied /opt/scd/cis_hardening.yml.
+# Review and test on UAT before production use. Run as root.
+set -Eeuo pipefail
+umask 077
+LOG="/var/log/cis_hardening_$(date +%Y%m%d_%H%M%S).log"
+exec > >(tee -a "$LOG") 2>&1
+
+if [[ ${EUID} -ne 0 ]]; then echo "ERROR: Run as root." >&2; exit 1; fi
+if [[ ${1:-} == "--help" ]]; then echo "Usage: $0 [--yes]  Default is interactive; --yes skips confirmation."; exit 0; fi
+if [[ ${1:-} != "--yes" ]]; then
+  echo "WARNING: This script modifies security/authentication, SSH, audit, mount, sysctl, package and service settings."
+  echo "Log: $LOG"
+  read -r -p "Continue on this server? Type YES: " answer
+  [[ "$answer" == "YES" ]] || { echo "Cancelled."; exit 1; }
+fi
+
+backup_file() { local f="$1"; if [[ -e "$f" && ! -e "$f.cisbak" ]]; then cp -a -- "$f" "$f.cisbak"; fi; }
+ensure_line() { local file="$1" key="$2" value="$3"; touch "$file"; backup_file "$file"; if grep -Eq "^[[:space:]]*${key}[[:space:]]*=" "$file"; then sed -ri "s|^[[:space:]]*${key}[[:space:]]*=.*|${key} = ${value}|" "$file"; else printf '\n%s = %s\n' "$key" "$value" >> "$file"; fi; }
+
+run_if_exists() { local desc="$1"; shift; if "$@"; then :; else echo "WARNING: $desc failed (continuing where possible)."; fi; }
+
+# 1. Modprobe config: the Ansible source and destination are the same local path.
+if [[ -f /etc/modprobe.d/CIS.conf ]]; then chmod 0644 /etc/modprobe.d/CIS.conf; else echo "WARNING: /etc/modprobe.d/CIS.conf not found; no file copied."; fi
+rm -f /etc/at.deny
+systemctl enable crond.service
+
+# 2. GDM banner. dconf update may be unavailable on headless servers.
+install -d -m 0755 /etc/dconf/db/gdm.d
+cat > /etc/dconf/db/gdm.d/01-banner-message <<'BANNER'
+[org/gnome/login-screen]
+banner-message-enable=true
+banner-message-text='WARNING: This system is for the use of authorized users for authorized purposes only. Activities on this system are being recorded and monitored by the Bank. Individuals, using this system without authority, or in excess of their authority shall be treated as having violated the IT Policy and IS Policy of the Bank and, are subject to legal/disciplinary actions as per the policy of the Bank.'
+BANNER
+chmod 0644 /etc/dconf/db/gdm.d/01-banner-message
+run_if_exists "dconf update" dconf update
+
+# 3. Authselect. NOTE: the original playbook's copy source/destination are identical;
+# these commands only create the reference directory and select the requested profile.
+install -d -m 0755 /etc/authselect/custom/sssd
+if command -v authselect >/dev/null 2>&1; then
+  run_if_exists "authselect select" authselect select sssd with-faillock with-pwhistory --force
+  run_if_exists "authselect apply-changes" authselect apply-changes
+else echo "WARNING: authselect not installed."; fi
+
+# 4. AIDE cron at 05:00 daily (avoid duplicate entry).
+if command -v crontab >/dev/null 2>&1; then
+  (crontab -l 2>/dev/null | grep -Fv '# CIS: aide check'; echo '0 5 * * * /usr/sbin/aide --check # CIS: aide check') | crontab -
+else echo "WARNING: crontab command not found; AIDE cron not added."; fi
+
+# 5. /tmp and /dev/shm fstab settings. Back up before edits.
+if [[ -f /etc/fstab ]]; then
+  backup_file /etc/fstab
+  if grep -Eq '^/dev/mapper/rhel-tmp[[:space:]]+/tmp[[:space:]]+xfs[[:space:]]+defaults([[:space:]]|$)' /etc/fstab; then
+    sed -ri 's|^(/dev/mapper/rhel-tmp[[:space:]]+/tmp[[:space:]]+xfs[[:space:]]+)defaults([[:space:]]+0[[:space:]]+0.*)$|\1defaults,nodev,nosuid,noexec 0 0|' /etc/fstab
+  else echo "INFO: Expected /tmp fstab entry not found; not rewritten automatically."; fi
+  if grep -Eq '^tmpfs[[:space:]]+/dev/shm[[:space:]]+' /etc/fstab; then
+    sed -ri 's|^tmpfs[[:space:]]+/dev/shm[[:space:]]+.*$|tmpfs   /dev/shm    tmpfs   defaults,nodev,nosuid,noexec   0 0|' /etc/fstab
+  else echo 'tmpfs   /dev/shm    tmpfs   defaults,nodev,nosuid,noexec   0 0' >> /etc/fstab; fi
+fi
+
+# 6. Password quality/history/faillock configuration.
+for f in /etc/security/pwquality.conf /etc/security/pwhistory.conf /etc/security/faillock.conf; do
+  [[ -e "$f" ]] && backup_file "$f" || { install -m 0644 /dev/null "$f"; }
+done
+set_conf_value() { local file="$1" key="$2" value="$3"; if grep -Eq "^[[:space:]#]*${key}[[:space:]]*=" "$file"; then sed -ri "s|^[[:space:]#]*${key}[[:space:]]*=.*|${key} = ${value}|" "$file"; else printf '%s = %s\n' "$key" "$value" >> "$file"; fi; }
+set_conf_value /etc/security/pwquality.conf minlen 14
+set_conf_value /etc/security/pwquality.conf retry 3
+set_conf_value /etc/security/pwquality.conf minclass 4
+set_conf_value /etc/security/pwhistory.conf remember 5
+set_conf_value /etc/security/faillock.conf deny 5
+set_conf_value /etc/security/faillock.conf unlock_time 900
+# Use explicit enabled settings rather than relying on commented defaults.
+set_conf_value /etc/security/faillock.conf audit ""
+set_conf_value /etc/security/faillock.conf silent ""
+for f in /etc/security/pwquality.conf /etc/security/pwhistory.conf /etc/security/faillock.conf; do
+  awk '!seen[$0]++' "$f" > "$f.tmp" && cat "$f.tmp" > "$f" && rm -f "$f.tmp"
+done
+
+# 7. Remove xorg-x11 packages (the original playbook uses --nodeps; high risk).
+# Safer default: report packages and require explicit opt-in to erase.
+if rpm -qa 'xorg-x11*' | grep -q .; then
+  echo "WARNING: xorg-x11 packages are installed. They are NOT removed automatically by this script."
+  echo "Review with: rpm -qa 'xorg-x11*' ; remove manually only after impact assessment."
+fi
+
+systemctl daemon-reload
+run_if_exists "remount /tmp" mount -o remount /tmp
+run_if_exists "remount /dev/shm" mount -o remount /dev/shm
+
+# 8. SSH configuration. Original Ansible copy source/destination are the same local file.
+# Do not overwrite sshd_config from another host; validate current config and fix ownership/modes.
+if [[ -f /etc/ssh/sshd_config ]]; then
+  backup_file /etc/ssh/sshd_config
+  chmod 0600 /etc/ssh/sshd_config
+  if command -v sshd >/dev/null 2>&1; then sshd -t -f /etc/ssh/sshd_config; fi
+fi
+find /etc/ssh ! \( -user root -group root \) -print -exec chown -h root:root {} \;
+find /etc/ssh -maxdepth 1 -type f -name 'ssh_host_*_key' ! -perm 0600 -print -exec chmod 0600 {} \;
+find /etc/ssh -maxdepth 1 -type f -name 'ssh_host_*_key.pub' ! -perm 0644 -print -exec chmod 0644 {} \;
+# Restart only if config validates; existing sessions should remain but new SSH access may be affected.
+if command -v sshd >/dev/null 2>&1 && sshd -t -f /etc/ssh/sshd_config; then run_if_exists "restart sshd" systemctl restart sshd; fi
+
+# 9. Network sysctl settings. WARNING: ip_forward=0 may break router/container/registry networking.
+rm -f /etc/sysctl.d/99-custom-hardening.conf
+backup_file /etc/sysctl.conf
+ensure_line /etc/sysctl.conf net.ipv4.conf.all.rp_filter 1
+ensure_line /etc/sysctl.conf net.ipv4.conf.default.rp_filter 1
+ensure_line /etc/sysctl.conf net.ipv4.conf.all.send_redirects 0
+ensure_line /etc/sysctl.conf net.ipv4.conf.default.send_redirects 0
+ensure_line /etc/sysctl.conf net.ipv4.icmp_ignore_bogus_error_responses 1
+if [[ ${ALLOW_IP_FORWARD_DISABLE:-no} == yes ]]; then ensure_line /etc/sysctl.conf net.ipv4.ip_forward 0; else echo 'INFO: Skipping net.ipv4.ip_forward=0 to avoid disrupting container/registry networking. Set ALLOW_IP_FORWARD_DISABLE=yes only after approval.'; fi
+ensure_line /etc/sysctl.conf net.ipv4.tcp_syncookies 1
+run_if_exists "sysctl --system" sysctl --system
+
+# 10. Disable/remove selected services/packages. Package removals use safer yum remove, not rpm --nodeps.
+for svc in avahi-daemon.socket avahi-daemon.service; do run_if_exists "stop $svc" systemctl stop "$svc"; run_if_exists "disable $svc" systemctl disable "$svc"; done
+if rpm -qa 'avahi*' | grep -q .; then echo 'INFO: avahi packages present; not force-removed. Review package dependencies before removal.'; fi
+
+# Audit config copy tasks in the YAML are local source == destination; back up and fix invalid syntax.
+if [[ -f /etc/audit/rules.d/audit.rules ]]; then
+  backup_file /etc/audit/rules.d/audit.rules
+  sed -i 's/auid!=unaudited/auid!=4294967295/g' /etc/audit/rules.d/audit.rules
+  awk '!seen[$0]++' /etc/audit/rules.d/audit.rules > /etc/audit/rules.d/audit.rules.tmp
+  cat /etc/audit/rules.d/audit.rules.tmp > /etc/audit/rules.d/audit.rules && rm -f /etc/audit/rules.d/audit.rules.tmp
+fi
+if [[ -f /etc/audit/auditd.conf ]]; then backup_file /etc/audit/auditd.conf; fi
+if command -v service >/dev/null 2>&1; then run_if_exists "restart auditd" service auditd restart; fi
+
+# 11. Disable core dump storage.
+install -d -m 0755 /etc/systemd
+for kv in 'Storage none' 'ProcessSizeMax 0'; do set -- $kv; key="$1"; val="$2"; file=/etc/systemd/coredump.conf; [[ -e $file ]] && backup_file "$file" || touch "$file"; if grep -Eq "^[[:space:]#]*${key}[[:space:]]*=" "$file"; then sed -ri "s|^[[:space:]#]*${key}[[:space:]]*=.*|${key}=${val}|" "$file"; else printf '\n[Coredump]\n%s=%s\n' "$key" "$val" >> "$file"; fi; done
+
+run_if_exists 'stop cups' systemctl stop cups
+run_if_exists 'disable cups' systemctl disable cups
+if rpm -qa 'cups*' | grep -q .; then echo 'INFO: cups packages present; not force-removed. Review dependencies before removal.'; fi
+
+# 12. Password aging defaults and per-user policy.
+backup_file /etc/login.defs
+ensure_line /etc/login.defs PASS_MAX_DAYS 90
+ensure_line /etc/login.defs PASS_MIN_DAYS 7
+ensure_line /etc/login.defs PASS_WARN_AGE 14
+if [[ -f /etc/default/useradd ]]; then backup_file /etc/default/useradd; ensure_line /etc/default/useradd INACTIVE 30; fi
+
+# Shell idle timeout. Ensure TMOUT assignment is present in both locations.
+install -d -m 0755 /etc/profile.d
+cat > /etc/profile.d/tmout.sh <<'TMOUT'
+TMOUT=900
+export TMOUT
+TMOUT
+chmod 0644 /etc/profile.d/tmout.sh
+backup_file /etc/bashrc
+if grep -Eq '^[[:space:]]*(readonly[[:space:]]+)?TMOUT=' /etc/bashrc; then sed -ri 's/^[[:space:]]*(readonly[[:space:]]+)?TMOUT=.*/TMOUT=900/' /etc/bashrc; else printf '\nTMOUT=900\n' >> /etc/bashrc; fi
+
+while IFS=: read -r user _ uid _; do
+  if [[ "$uid" =~ ^[0-9]+$ ]] && (( uid >= 1000 && uid != 65534 )); then chage -m 7 -M 90 -W 14 "$user" || echo "WARNING: chage failed for $user"; fi
+done < /etc/passwd
+chage -m 7 -M 90 -W 14 root
+
+# 13. Cron restrictions and permissions.
+rm -f /etc/cron.deny
+if [[ ! -e /etc/cron.allow ]]; then install -o root -g root -m 0640 /dev/null /etc/cron.allow; fi
+chown root:root /etc/cron.allow; chmod 0640 /etc/cron.allow
+for f in /etc/crontab; do [[ -e "$f" ]] && { chown root:root "$f"; chmod 0600 "$f"; }; done
+for d in /etc/cron.d /etc/cron.daily /etc/cron.hourly /etc/cron.monthly /etc/cron.weekly; do [[ -d "$d" ]] && { chown root:root "$d"; chmod 0700 "$d"; }; done
+
+# 14. GRUB permissions. Generate config only if absent.
+if [[ ! -e /boot/grub2/grub.cfg ]] && command -v grub2-mkconfig >/dev/null 2>&1; then grub2-mkconfig -o /boot/grub2/grub.cfg; fi
+if [[ -e /boot/grub2/grub.cfg ]]; then chown root:root /boot/grub2/grub.cfg; chmod 0600 /boot/grub2/grub.cfg; fi
+if [[ -e /boot/grub2/grubenv ]]; then chown root:root /boot/grub2/grubenv; chmod 0600 /boot/grub2/grubenv; fi
+
+# 15. Disable selected services and remove telnet packages if yum is available.
+run_if_exists 'disable named' systemctl disable named
+run_if_exists 'disable rpcbind' systemctl disable rpcbind
+run_if_exists 'stop telnet.socket' systemctl stop telnet.socket
+run_if_exists 'disable telnet.socket' systemctl disable telnet.socket
+if command -v yum >/dev/null 2>&1; then run_if_exists 'remove telnet packages' yum remove -y telnet telnet-server; elif command -v dnf >/dev/null 2>&1; then run_if_exists 'remove telnet packages' dnf remove -y telnet telnet-server; fi
+
+echo "Completed with any warnings shown above. Review log: $LOG"
+echo "IMPORTANT: Validate SSH access, authentication, auditd, mount settings, and application/container networking."
+
