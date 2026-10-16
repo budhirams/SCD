@@ -1,0 +1,142 @@
+SSH Server Configuration	Ownership, permissions, and secure options	Secure sshd_config with strict perms and approved options	X11Forwarding' not found in /etc/ssh/sshd_config	NO	Medium	55ab7bdd-4d90-4e84-b5c4-801e5290d78c	Enforce secure sshd_config settings and file permissions as per baseline.	Weak SSH hardening allows brute force and unauthorized access.	Set root:root ownership and 600 mode; configure Protocol 2, PermitRootLogin no, PermitEmptyPasswords no, X11Forwarding no, MaxAuthTries 4, ClientAliveInterval 300, ClientAliveCountMax 0, LoginGraceTime 60, strong MACs, Banner /etc/issue.net; restrict users/groups.	"var_ntwoc=$(stat -c '%U:%G %a %n' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_ntwoc contains root:root 600
+if $var_ntwoc = $$null$$
+  Display 'sshd_config not owned by root or not 600'
+
+***** XXXXX ******
+
+var_dawid=$(find /etc/ssh -xdev -type f -name 'ssh_host_*_key' -exec stat -c '%U:%G %a %n' {} \; 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_dawid contains root:root 600
+if $var_dawid = $$null$$
+  Display 'Private host key files not restricted to 600'
+
+***** XXXXX ******
+
+var_imfrq=$(sshd -T | grep -Ei '^\s*protocol\s+(1|1\s*,\s*2|2\s*,\s*1)\s*' 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_imfrq == $$null$$
+if $var_imfrq = $$null$$
+  Display 'Protocol version 2'
+
+***** XXXXX ******
+
+var_xitfh=$(grep -Ei '^\s*(LogLevel)\b' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_xitfh contains VERBOSE OR $var_xitfh contains INFO
+if $var_xitfh = $$null$$
+  Display 'LOGLEVEL not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_qwosz=$(grep -Ei '^\s*X11Forwarding' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_qwosz contains no
+if $var_qwosz = $$null$$
+  Display ''X11Forwarding' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_qobhw=$(grep -Ei '^\s*MaxAuthTries' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_qobhw contains 4
+if $var_qobhw = $$null$$
+  Display ''MaxAuthTries' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_ggplm=$(grep -Ei '^\s*IgnoreRhosts' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_ggplm contains yes
+if $var_ggplm = $$null$$
+  Display ''IgnoreRhosts' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_zymiq=$(grep -Ei '^\s*HostbasedAuthentication' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_zymiq contains no
+if $var_zymiq = $$null$$
+  Display ''HostbasedAuthentication' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_vwpbr=$(grep -Ei '^\s*PermitRootLogin' /etc/ssh/sshd_config 2>/dev/null | grep -i no)
+
+** FINAL RESULT **
+Compliance: $var_vwpbr != $$null$$
+if $var_vwpbr = $$null$$
+  Display ''PermitRootLogin no' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_ifzrs=$(grep -Ei '^\s*PermitEmptyPasswords' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_ifzrs contains no
+if $var_ifzrs = $$null$$
+  Display ''PermitEmptyPasswords' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_tswbi=$(grep -Ei '^\s*PermitUserEnvironment' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_tswbi contains no
+if $var_tswbi = $$null$$
+  Display ''PermitUserEnvironment' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_plxdv=$(grep -Ei '^\s*LoginGraceTime' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_plxdv contains 60
+if $var_plxdv = $$null$$
+  Display ''LoginGraceTime' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_drvth=$(grep -Ei '^\s*(clientaliveinterval)\b' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_drvth contains 300
+if $var_drvth = $$null$$
+  Display ''ClientAliveInterval' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_xdpld=$(grep -Ei '^\s*(clientalivecountmax)\b' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_xdpld contains 0
+if $var_xdpld = $$null$$
+  Display ''clientalivecountmax' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_sacan=$(grep -Ei '^\s*MACs\b' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_sacan does not contain hmac-md5 hmac-md5-96 AND $var_sacan does not contain hmac-ripemd160 AND $var_sacan does not contain hmac-sha1 AND $var_sacan does not match pattern umac-(64|128)@openssh.com AND $var_sacan does not contain hmac-md5-etm@openssh.com AND $var_sacan does not contain hmac-md5-96-etm@openssh.com AND $var_sacan does not contain hmac-ripemd160-etm@openssh.com AND $var_sacan does not contain hmac-sha1-etm@openssh.com AND $var_sacan does not contain hmac-sha1-96-etm@openssh.com AND $var_sacan does not contain umac-64-etm@openssh.com AND $var_sacan does not contain umac-128-etm@openssh.co AND $var_sacan does not contain umac-128@openssh.com
+if $var_sacan = $$null$$
+  Display ''MACs' not found in /etc/ssh/sshd_config'
+
+***** XXXXX ******
+
+var_lxtwm=$(grep -Ei '^\s*(allowusers|allowgroups|denyusers|denygroups|banner)\b' /etc/ssh/sshd_config 2>/dev/null)
+
+** FINAL RESULT **
+Compliance: $var_lxtwm != $$null$$
+if $var_lxtwm = $$null$$
+  Display ''allowusers', 'allowgroups', 'denyusers', 'banner' or 'denygroups' not found in /etc/ssh/sshd_config'
+"
