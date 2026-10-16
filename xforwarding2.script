@@ -155,3 +155,108 @@ echo
 echo "=================================================="
 echo " Audit completed. No configuration was modified."
 echo "=================================================="
+
+
+
+
+===============================================================================================================
+[root@CMPUATAPP149 tmp]# sh  x11Forwarding.sh
+==================================================
+ SCGuard SSH Configuration Compliance Audit
+==================================================
+Date: Fri Oct 16 18:08:29 IST 2026
+Server: CMPUATAPP149
+
+---- 1. Configuration ownership and permissions ----
+root:root 600 /etc/ssh/sshd_config
+Expected: root:root 600
+
+---- 2. SSH private host key permissions ----
+root:root 600 /etc/ssh/ssh_host_rsa_key
+root:root 600 /etc/ssh/ssh_host_dsa_key
+root:root 600 /etc/ssh/ssh_host_ed25519_key
+root:root 600 /etc/ssh/ssh_host_ecdsa_key
+Expected: root:root 600 for each private key
+
+---- 3. LogLevel ----
+133:LogLevel INFO
+Expected: INFO or VERBOSE
+
+---- 4. X11Forwarding ----
+134:X11Forwarding no
+Expected: no
+
+---- 5. MaxAuthTries ----
+135:MaxAuthTries 4
+Expected: 4
+
+---- 6. IgnoreRhosts ----
+136:IgnoreRhosts yes
+Expected: yes
+
+---- 7. HostbasedAuthentication ----
+137:HostbasedAuthentication no
+Expected: no
+
+---- 8. PermitRootLogin ----
+146:PermitRootLogin no
+Expected: no
+
+---- 9. PermitEmptyPasswords ----
+138:PermitEmptyPasswords no
+Expected: no
+
+---- 10. PermitUserEnvironment ----
+139:PermitUserEnvironment no
+Expected: no
+
+---- 11. LoginGraceTime ----
+142:LoginGraceTime 60
+Expected: 60
+
+---- 12. ClientAliveInterval ----
+140:ClientAliveInterval 300
+Expected: 300
+
+---- 13. ClientAliveCountMax ----
+141:ClientAliveCountMax 0
+Expected: 0
+
+---- 14. MACs ----
+143:MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+Review against approved strong MAC baseline
+
+---- 15. Banner ----
+147:Banner /etc/issue.net
+Expected: /etc/issue.net
+
+---- 16. User/group restrictions ----
+No explicit user/group restriction found
+
+---- 17. Banner file existence ----
+-rw-r--r--. 1 root root 394 Dec 30  2022 /etc/issue.net
+
+---- 18. Effective SSH settings ----
+logingracetime 60
+maxauthtries 4
+clientaliveinterval 300
+clientalivecountmax 0
+permitrootlogin no
+ignorerhosts yes
+hostbasedauthentication no
+x11forwarding no
+permitemptypasswords no
+macs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+banner /etc/issue.net
+loglevel INFO
+permituserenvironment no
+
+---- 19. SSH configuration syntax ----
+PASS: sshd configuration syntax is valid
+
+---- 20. Protocol directive (informational) ----
+132:Protocol 2
+
+==================================================
+ Audit completed. No configuration was modified.
+
