@@ -1,0 +1,157 @@
+
+#!/bin/bash
+
+# SCGuard SSH Server Configuration Audit
+# Read-only: does not modify SSH configuration.
+
+CFG="/etc/ssh/sshd_config"
+SSHD="/usr/sbin/sshd"
+
+echo "=================================================="
+echo " SCGuard SSH Configuration Compliance Audit"
+echo "=================================================="
+echo "Date: $(date)"
+echo "Server: $(hostname)"
+echo
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "WARNING: Run as root for complete results."
+fi
+
+if [ ! -f "$CFG" ]; then
+    echo "ERROR: $CFG not found."
+    exit 1
+fi
+
+echo "---- 1. Configuration ownership and permissions ----"
+stat -c '%U:%G %a %n' "$CFG"
+echo "Expected: root:root 600"
+echo
+
+echo "---- 2. SSH private host key permissions ----"
+find /etc/ssh -xdev -type f -name 'ssh_host_*_key' \
+    -exec stat -c '%U:%G %a %n' {} \; 2>/dev/null
+echo "Expected: root:root 600 for each private key"
+echo
+
+echo "---- 3. LogLevel ----"
+grep -inE '^[[:space:]]*LogLevel([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: LogLevel"
+echo "Expected: INFO or VERBOSE"
+echo
+
+echo "---- 4. X11Forwarding ----"
+grep -inE '^[[:space:]]*X11Forwarding([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: X11Forwarding"
+echo "Expected: no"
+echo
+
+echo "---- 5. MaxAuthTries ----"
+grep -inE '^[[:space:]]*MaxAuthTries([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: MaxAuthTries"
+echo "Expected: 4"
+echo
+
+echo "---- 6. IgnoreRhosts ----"
+grep -inE '^[[:space:]]*IgnoreRhosts([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: IgnoreRhosts"
+echo "Expected: yes"
+echo
+
+echo "---- 7. HostbasedAuthentication ----"
+grep -inE '^[[:space:]]*HostbasedAuthentication([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: HostbasedAuthentication"
+echo "Expected: no"
+echo
+
+echo "---- 8. PermitRootLogin ----"
+grep -inE '^[[:space:]]*PermitRootLogin([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: PermitRootLogin"
+echo "Expected: no"
+echo
+
+echo "---- 9. PermitEmptyPasswords ----"
+grep -inE '^[[:space:]]*PermitEmptyPasswords([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: PermitEmptyPasswords"
+echo "Expected: no"
+echo
+
+echo "---- 10. PermitUserEnvironment ----"
+grep -inE '^[[:space:]]*PermitUserEnvironment([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: PermitUserEnvironment"
+echo "Expected: no"
+echo
+
+echo "---- 11. LoginGraceTime ----"
+grep -inE '^[[:space:]]*LoginGraceTime([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: LoginGraceTime"
+echo "Expected: 60"
+echo
+
+echo "---- 12. ClientAliveInterval ----"
+grep -inE '^[[:space:]]*ClientAliveInterval([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: ClientAliveInterval"
+echo "Expected: 300"
+echo
+
+echo "---- 13. ClientAliveCountMax ----"
+grep -inE '^[[:space:]]*ClientAliveCountMax([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: ClientAliveCountMax"
+echo "Expected: 0"
+echo
+
+echo "---- 14. MACs ----"
+grep -inE '^[[:space:]]*MACs([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: MACs directive"
+echo "Review against approved strong MAC baseline"
+echo
+
+echo "---- 15. Banner ----"
+grep -inE '^[[:space:]]*Banner([[:space:]]|$)' "$CFG" \
+    || echo "MISSING: Banner directive"
+echo "Expected: /etc/issue.net"
+echo
+
+echo "---- 16. User/group restrictions ----"
+grep -inE '^[[:space:]]*(AllowUsers|AllowGroups|DenyUsers|DenyGroups)([[:space:]]|$)' "$CFG" \
+    || echo "No explicit user/group restriction found"
+echo
+
+echo "---- 17. Banner file existence ----"
+if [ -f /etc/issue.net ]; then
+    ls -l /etc/issue.net
+else
+    echo "WARNING: /etc/issue.net does not exist"
+fi
+echo
+
+echo "---- 18. Effective SSH settings ----"
+if [ -x "$SSHD" ]; then
+    "$SSHD" -T 2>&1 | grep -E \
+    '^(loglevel|x11forwarding|maxauthtries|ignorerhosts|hostbasedauthentication|permitrootlogin|permitemptypasswords|permituserenvironment|logingracetime|clientaliveinterval|clientalivecountmax|macs|banner) ' \
+    || true
+else
+    echo "WARNING: sshd binary not found at $SSHD"
+fi
+echo
+
+echo "---- 19. SSH configuration syntax ----"
+if [ -x "$SSHD" ]; then
+    if "$SSHD" -t; then
+        echo "PASS: sshd configuration syntax is valid"
+    else
+        echo "FAIL: sshd configuration validation failed"
+    fi
+else
+    echo "SKIP: sshd binary unavailable"
+fi
+echo
+
+echo "---- 20. Protocol directive (informational) ----"
+grep -inE '^[[:space:]]*Protocol([[:space:]]|$)' "$CFG" \
+    || echo "No explicit Protocol directive; normal on modern OpenSSH"
+echo
+
+echo "=================================================="
+echo " Audit completed. No configuration was modified."
+echo "=================================================="
